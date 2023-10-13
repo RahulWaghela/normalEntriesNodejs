@@ -2,7 +2,7 @@ const express = require('express')
 const app = express();
 const ejs = require('ejs');
 app.set('view engine', 'ejs');
-const port = 1200;
+const port = 1870;
 require('dotenv').config();
 require('./database/database');
 const { allDetailsofUser, FormData, Telecom } = require('./model/schema');
