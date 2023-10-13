@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <title>Hello, world!</title>
+  <style>
+    #newTable {
+      width: 100%;
+      margin-top: 28px;
+
+    }
+    .mainContainer{
+        display: flex;
+      }
+    .container {
+      width: 43%;
+      height: 1%;
+    }
+    /* .pagination{
+     background-color: black;
+     width: 10%;
+     padding: 5px;
+     border-radius: ;
+    } */
+     
+    .simDatapagination{
+      display: flex;
+    justify-content: space-between;
+    width: 12%;
+    }
+   .simDatapagination a{
+      background: black;
+    color: white;
+    text-decoration: none;
+    padding: 3px;
+    border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('partials/navbar') %>
+
+
+    <div class="mainContainer">
+
+      <div class="container mt-3 p-4 shadow-lg">
+        <h2 class="text-center"></h2>
+        <form action="/sendNEWDB" method="post">
+
+          <div class="form-group">
+            <input type="text" name="airtel_A" class="form-control" id="" placeholder="airtel_A">
+          </div>
+
+          <div class="form-group">
+            <input type="text" class="form-control" name="airtel_M" id="" placeholder="airtel_M">
+          </div>
+
+          <div class="form-group">
+            <input type="text" class="form-control" name="BSNL" id="" placeholder="BSNL">
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">submit</button>
+        </form>
+      </div>
+
+      <div class="container mt-3 p-4 shadow-lg" id="secondContainer">
+        <table class="table" id="newTable">
+          <thead>
+              <tr>
+                  <th>Operator</th>
+                  <th>Sim</th>
+                  <th>Data </th>
+                  <th>Last Update</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>Airtel_A</td>
+                  <td id="airtelAOriginal"></td>
+                  <td id="airtelA100"></td>
+                  <td id="airtelATime"></td>
+              </tr>
+              <tr>
+                  <td>Airtel_M</td>
+                  <td id="airtelMOriginal"></td>
+                  <td id="airtelM100"></td>
+                  <td id="airtelMTime"></td>
+              </tr>
+              <tr>
+                  <td>BSNL</td>
+                  <td id="bsnlOriginal"></td>
+                  <td id="bsnl100"></td>
+                  <td id="bsnlTime"></td>
+              </tr>
+              <tr>
+                  <td>totalL</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+              </tr>
+              
+          </tbody>
+      </table>
+      </div>
+
+    </div>
+
+
+    <div class="container mt-5 p-4 shadow-lg w-100">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">index</th>
+            <th scope="col">airtel_A</th>
+            <th scope="col">airtel_M</th>
+            <th scope="col">BSNL</th>
+            <th scope="col">Last Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% telecomData.forEach((data, index)=> { %>
+            <tr>
+              <td><%= (currentPage - 1) * ITEMS_PER_PAGEs + index + 1 %></td>
+              <td>
+                <%= data.airtel_A %>
+              </td>
+              <td>
+                <%= data.airtel_M %>
+              </td>
+              <td>
+                <%= data.BSNL %>
+              </td>
+              <td>
+                <%= data.createdAt.toLocaleString() %>
+              </td>
+            </tr>
+            <% }); %>
+        </tbody>
+      </table>
+
+      <div class="simDatapagination">
+        <% if (telecomData.length === ITEMS_PER_PAGEs) { %>
+            <a href="/simData?page=<%= currentPage + 1 %>">Next</a>
+        <% } %>
+        <% if (currentPage > 1) { %>
+            <a href="/simData?page=<%= currentPage - 1 %>">Previous</a>
+        <% } %>
+    </div>
+
+
+     <script>
+
+// Find all the table rows in the tbody
+const tableRows = document.querySelectorAll(".table tbody tr");
+
+// Initialize variables to store the last values and date/time
+let lastAirtelA = null;
+let lastAirtelM = null;
+let lastBSNL = null;
+let lastUpdateTime = null;
+
+// Loop through each row and extract the data
+tableRows.forEach((row) => {
+  const cells = row.querySelectorAll("td");
+  if (cells.length >= 5) {
+    const airtelA = parseInt(cells[1].textContent, 10);
+    const airtelM = parseInt(cells[2].textContent, 10);
+    const bsnl = parseInt(cells[3].textContent, 10);
+    const updateTime = new Date(cells[4].textContent);
+
+    // Check if the current row has valid data
+    if (!isNaN(airtelA) && !isNaN(airtelM) && !isNaN(bsnl)) {
+      // Check if this row has a more recent update time
+      if (!lastUpdateTime || updateTime > lastUpdateTime) {
+        lastAirtelA = airtelA;
+        lastAirtelM = airtelM;
+        lastBSNL = bsnl;
+        lastUpdateTime = updateTime;
+      }
+    }
+  }
+});
+
+// Log the values in the console
+console.log("Last airtel_A (Original):", lastAirtelA);
+console.log("Last airtel_A (*100):", lastAirtelA !== null ? lastAirtelA * 100 : null);
+console.log("Last airtel_M (Original):", lastAirtelM);
+console.log("Last airtel_M (*100):", lastAirtelM !== null ? lastAirtelM * 100 : null);
+console.log("Last BSNL (Original):", lastBSNL);
+console.log("Last BSNL (*100):", lastBSNL !== null ? lastBSNL * 100 : null);
+console.log("Last Update Time:", lastUpdateTime);
+
+// Find the table by its id "newTable"
+const newTable = document.getElementById("newTable");
+
+if (newTable) {
+  // Find the rows in the table body
+  const tbody = newTable.querySelector("tbody");
+
+  if (tbody) {
+    const rows = tbody.getElementsByTagName("tr");
+
+    // Update the table cells with both the original and multiplied values
+    if (rows.length >= 3) {
+      rows[0].getElementsByTagName("td")[1].textContent = lastAirtelA !== null ? `${lastAirtelA} (${lastAirtelA * 100})` : "";
+      rows[1].getElementsByTagName("td")[1].textContent = lastAirtelM !== null ? `${lastAirtelM} (${lastAirtelM * 100})` : "";
+      rows[2].getElementsByTagName("td")[1].textContent = lastBSNL !== null ? `${lastBSNL} (${lastBSNL * 100})` : "";
+    }
+  }
+}
+
+function updateTable() {
+            // Assuming you have already extracted the values and stored them in variables lastAirtelA, lastAirtelM, lastBSNL, and lastUpdateTime
+
+            // Update the table cells with the values
+            document.getElementById("airtelAOriginal").textContent = lastAirtelA !== null ? lastAirtelA : "";
+            document.getElementById("airtelA100").textContent = lastAirtelA !== null ? lastAirtelA * 100 : "";
+            document.getElementById("airtelATime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
+
+            document.getElementById("airtelMOriginal").textContent = lastAirtelM !== null ? lastAirtelM : "";
+            document.getElementById("airtelM100").textContent = lastAirtelM !== null ? lastAirtelM * 100 : "";
+            document.getElementById("airtelMTime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
+
+            document.getElementById("bsnlOriginal").textContent = lastBSNL !== null ? lastBSNL : "";
+            document.getElementById("bsnl100").textContent = lastBSNL !== null ? lastBSNL * 100 : "";
+            document.getElementById("bsnlTime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
+        }
+
+        // Add an event listener to run the function when the document is ready
+        document.addEventListener("DOMContentLoaded", updateTable);
+
+
+        // Function to calculate and update the total values
+function updateTotal() {
+    const totalAirtelA = lastAirtelA !== null ? lastAirtelA : 0;
+    const totalAirtelM = lastAirtelM !== null ? lastAirtelM : 0;
+    const totalBSNL = lastBSNL !== null ? lastBSNL : 0;
+    
+    // Calculate the sum of original values and multiplied values
+    const totalOriginal = totalAirtelA + totalAirtelM + totalBSNL;
+    const totalMultiplied = (totalAirtelA * 100) + (totalAirtelM * 100) + (totalBSNL * 100);
+    
+    // Update the "totalL" row in the table
+    const totalRow = document.querySelector(".table tbody tr:last-child");
+    totalRow.querySelector("td").textContent = "Total";
+    totalRow.querySelector("td").nextElementSibling.textContent = totalOriginal;
+    totalRow.querySelector("td").nextElementSibling.nextElementSibling.textContent = totalMultiplied;
+}
+
+// Call the updateTotal function to calculate and update the total values
+updateTotal();
+
+</script>
+      
+    </div>
+
+
+    
+
+          <!-- <table class="table" id="newTable">
+            <thead>
+              <tr>
+                <th scope="col">Operator</th>
+                <th scope="col">Sim</th>
+                <th scope="col">Data</th>
+                <th scope="col">Last Update</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td scope="col">airtel_A</td>
+                <td scope="col"></td>
+                <td scope="col"></td>
+                <td scope="col"></td>
+              </tr>
+              <tr>
+                <td>airtel_M</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>BSNL</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table> -->
+
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"></script>
+</body>
+
+</html>
