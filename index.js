@@ -78,11 +78,10 @@ app.get('/Queuereport', async (req, res) => {
 // queue get Request Ends
 
 
-
-
 app.get('/sentReport', async (req, res) => {
   try {
     const selectedDate = req.query.date;
+    const selectedOperator = req.query.operator; // Get the operator from the query parameters
 
     let pipeline = [
       {
@@ -113,8 +112,23 @@ app.get('/sentReport', async (req, res) => {
       ];
     }
 
+    if (selectedOperator) {
+      pipeline = [
+        {
+          $match: {
+            selectbox: selectedOperator // Filter by the specified operator
+          },
+          ...pipeline // Include the previous stages for filtering
+    }];
+    }
+
     const latestEntries = await FormData.aggregate(pipeline);
-    res.render('sentreport', { latestEntries });
+
+    // Calculate the total "Sent" value for the specified operator
+    const totalSent = latestEntries.reduce((total, entry) => total + entry.sent, 0);
+
+    // Render a new view with the total value
+    res.render('sentreport', { latestEntries, totalSent, selectedOperator });
   } catch (error) {
     console.log(error);
   }

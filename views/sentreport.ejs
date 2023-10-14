@@ -26,38 +26,51 @@
         </form>
         
         
-
+        <h1>Sent Report</h1>
 <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Client</th>
-      <th scope="col">Data</th>
-      <th scope="col">Sent</th>
-      <th scope="col">Operator</th>
-      <th scope="col">Pending</th>
-      <th scope="col">Last Update</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% latestEntries.forEach((user, index) => { %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= user.clientSelect %></td>
-        <td><%= user.data %></td>
-        <td><%= user.sent %></td>
-        <td><%= user.selectbox %></td>
-        <td><%= user.pending %></td>
-        <td><%= new Date(user.createdAt).toLocaleString() %></td>
-      </tr>
-    <% }); %>
-  </tbody>
- 
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Client</th>
+            <th scope="col">Data</th>
+            <th scope="col">Sent</th>
+            <th scope="col">Operator</th>
+            <th scope="col">Pending</th>
+            <th scope="col">Last Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% latestEntries.forEach((user, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= user.clientSelect %></td>
+                <td><%= user.data %></td>
+                <td><%= user.sent %></td>
+                <td><%= user.selectbox %></td>
+                <td><%= user.pending %></td>
+                <td><%= new Date(user.createdAt).toLocaleString() %></td>
+            </tr>
+        <% }); %>
+    </tbody>
 </table>
-  <!-- Pagination controls -->
 
+
+
+  <!-- Pagination controls -->
+  <% // Calculate the total for A_airtel, M_airtel, and bsnl operators %>
+  <% const totalAirtelA = latestEntries.filter(entry => entry.selectbox === 'A_airtel').reduce((total, entry) => total + entry.sent, 0); %>
+  <% const totalAirtelM = latestEntries.filter(entry => entry.selectbox === 'M_airtel').reduce((total, entry) => total + entry.sent, 0); %>
+  <% const totalBsnl = latestEntries.filter(entry => entry.selectbox === 'bsnl').reduce((total, entry) => total + entry.sent, 0); %>
+  
+  <h2>Total A_airtel: <%= totalAirtelA %></h2>
+  <h2>Total M_airtel: <%= totalAirtelM %></h2>
+  <h2>Total Bsnl: <%= totalBsnl %></h2>
+  
+  <h1>Total Sent: <%= totalSent %></h1>
 </div>
     
+
+
 
 
   
