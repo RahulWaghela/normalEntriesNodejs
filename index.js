@@ -5,7 +5,7 @@ app.set('view engine', 'ejs');
 const port = 1870;
 require('dotenv').config();
 require('./database/database');
-const { allDetailsofUser, FormData, Telecom } = require('./model/schema');
+const { allDetailsofUser, FormData, Telecom,DataSchedul } = require('./model/schema');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -119,7 +119,7 @@ app.get('/sentReport', async (req, res) => {
             selectbox: selectedOperator // Filter by the specified operator
           },
           ...pipeline // Include the previous stages for filtering
-    }];
+        }];
     }
 
     const latestEntries = await FormData.aggregate(pipeline);
@@ -249,8 +249,61 @@ app.get('/simData', async (req, res) => {
     res.status(500).send('Error fetching data.');
   }
 });
-
 // simdata post and get request Ends
+
+
+
+
+// DataSchedule starts
+app.post('/sendDetailsToServer', async (req, res) => {
+  try {
+    const { client, operator, data, date } = req.body;
+
+    // Create a new Data document
+    const newData = new DataSchedul({
+      client,
+      operator,
+      data,
+      date
+    });
+
+
+    console.log(`here is our all data ..${newData}`);
+
+    // Save the data to the MongoDB database
+    await newData.save();
+
+    // Redirect to a success page or do any additional processing as needed
+    res.redirect('/DataSchedule');
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).send('Error saving data to the database');
+  }
+});
+
+
+app.get('/DataSchedule', async (req, res) => {
+  try {
+    const allUsers = await allDetailsofUser.find();
+    const dataSchedul = await DataSchedul.find();
+
+    // Format the date and remove the time and timezone information
+    const formattedDataSchedul = dataSchedul.map(data => ({
+      client: data.client,
+      operator: data.operator,
+      data: data.data,
+      date: data.date.toISOString().slice(0, 10)
+    }));
+
+    res.render('DataSchedule', { allUsers, dataSchedul: formattedDataSchedul });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+// DataSchedule Ends
 
 app.listen(port, () => {
   console.log(`Server Running at http://localhost:${port}`);

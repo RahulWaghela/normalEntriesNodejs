@@ -5,5 +5,5 @@ mongoose.connect(process.env.DB,{
       useUnifiedTopology: true
 }).then((err)=>{
       if(err) err
-      console.log("Connected succesfully..");
+      console.log("Connected succesfully with atlas..");
 });

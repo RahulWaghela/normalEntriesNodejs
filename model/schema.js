@@ -61,11 +61,29 @@ const temSchema = new mongoose.Schema({
       default: Date.now,
     },
 });
+// schema data schema ends
 
-  // schema data schema ends
+
+
+// data schedule starts
+const dataSchema = new mongoose.Schema({
+  client: String,
+  operator: String,
+  data: Number,
+  date: Date
+});
+// data schedule Ends
   
   const Telecom = mongoose.model('Telecom', telecomSchema);
   const FormData = new mongoose.model('FormData', formDataSchema);
   const allDetailsofUser = new mongoose.model('allDetailsofUser', temSchema);
-module.exports= {allDetailsofUser,FormData,Telecom}
+  const DataSchedul  = new mongoose.model('DataSchedul', dataSchema);
+
+
+module.exports= {
+  allDetailsofUser,
+  FormData,
+  Telecom,
+  DataSchedul 
+}
 
