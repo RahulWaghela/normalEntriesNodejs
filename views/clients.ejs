@@ -34,7 +34,6 @@
   <thead>
     <tr>
       <th scope="col">Name</th>
-      <th scope="col">Data</th>
       <th scope="col">Phone Number</th>
       <th scope="col">Email</th>
       <th scope="col">Date and Time</th>
@@ -44,7 +43,6 @@
     <% for (let i = 0; i < allUsers.length; i++) { %>
       <tr>
         <td><%= allUsers[i].name %></td>
-        <td><%= allUsers[i].data %></td>
         <td><%= allUsers[i].phone %></td>
         <td><%= allUsers[i].email %></td>
         <td><%= allUsers[i].createdAt.toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }) %></td>

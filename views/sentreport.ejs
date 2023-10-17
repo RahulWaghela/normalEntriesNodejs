@@ -9,12 +9,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="path/to/datepicker.css">
     <title>Hello, world!</title>
+    <style>
+      /* .cont{
+        width: 100vw;
+        color: white;
+        display: flex;
+      } */
+    </style>
   </head>
   <body>
     <%- include('partials/navbar') %>
 
     <div class="container mt-5 p-4 shadow-lg w-100">
+      <!-- <div class="cont"> -->
 
+        <!-- background-color: white;" -->
     <div class="container mt-5 p-4 shadow-lg" style="width: 85%;">
         <h2 class="text-center">Last update</h2>
 
@@ -25,32 +34,32 @@
           <input type="submit" value="Filter">
         </form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Client</th>
-            <th scope="col">Data</th>
-            <th scope="col">Sent</th>
-            <th scope="col">Operator</th>
-            <th scope="col">Pending</th>
-            <th scope="col">Last Update</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% latestEntries.forEach((user, index) => { %>
-            <tr>
-                <td><%= index + 1 %></td>
-                <td><%= user.clientSelect %></td>
-                <td><%= user.data %></td>
-                <td><%= user.sent %></td>
-                <td><%= user.selectbox %></td>
-                <td><%= user.pending %></td>
-                <td><%= new Date(user.createdAt).toLocaleString() %></td>
-            </tr>
-        <% }); %>
-    </tbody>
-</table>
+        <table class="table table-hover">
+          <thead>
+              <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Client</th>
+                  <th scope="col">A_airtel</th>
+                  <th scope="col">M_airtel</th>
+                  <th scope="col">BSNL</th>
+                  <th scope="col">Last Update</th>
+              </tr>
+          </thead>
+          <tbody>
+              <% latestEntries.forEach((user, index) => { %>
+                  <tr>
+                      <td><%= index + 1 %></td>
+                      <td><%= user.clientSelect %></td>
+                      <td><%= user.selectbox === 'A_airtel' ? user.sent : '' %></td>
+                      <td><%= user.selectbox === 'M_airtel' ? user.sent : '' %></td>
+                      <td><%= user.selectbox === 'BSNL' ? user.sent : '' %></td>
+                      <td><%= new Date(user.createdAt).toLocaleString() %></td>
+                  </tr>
+              <% }); %>
+          </tbody>
+      </table>
+      
+      
 
  
 </div>
@@ -66,7 +75,7 @@
   <% const totalAirtelM = latestEntries.filter(entry => entry.selectbox === 'M_airtel').reduce((total, entry) => total + entry.sent, 0); %>
   <% const totalBsnl = latestEntries.filter(entry => entry.selectbox === 'bsnl').reduce((total, entry) => total + entry.sent, 0); %>
 
-<table class="table">
+<table class="table table-hover">
   <thead>
     <tr>
       <th>Operator</th>

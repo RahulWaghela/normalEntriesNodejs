@@ -82,7 +82,8 @@ app.get('/sentReport', async (req, res) => {
   try {
     const selectedDate = req.query.date;
     const selectedOperator = req.query.operator; // Get the operator from the query parameters
-
+  const fmd=await FormData.find({});
+  console.log(fmd);
     let pipeline = [
       {
         $sort: { lastUpdate: 1 }
@@ -142,6 +143,7 @@ app.get('/sentReport', async (req, res) => {
 
 app.get('/QueueData', async (req, res) => {
   const allUsers = await allDetailsofUser.find();
+  console.log(allDetailsofUser);
   res.render('QueueData', { allUsers });
 })
 

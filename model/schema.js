@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const temSchema = new mongoose.Schema({
     name: String,
-    data: Number,
+    // data: Number,
     phone: Number,
     email: String,
     createdAt: {
@@ -17,9 +17,9 @@ const temSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    data:{
-        type:Number
-    },
+    // data:{
+    //     type:Number
+    // },
     sent: {
       type:Number,
     },
