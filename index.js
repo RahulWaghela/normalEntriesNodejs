@@ -20,7 +20,7 @@ app.get('/addClients', (req, res) => {
 
 
 // client get Request Starts
-const ITEMS_PER_PAGE = 5; // Number of records to display per page
+const ITEMS_PER_PAGE = 10; // Number of records to display per page
 
 app.get('/clients', async (req, res) => {
   try {
