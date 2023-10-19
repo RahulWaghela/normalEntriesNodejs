@@ -42,20 +42,19 @@
                   <th scope="col">A_airtel</th>
                   <th scope="col">M_airtel</th>
                   <th scope="col">BSNL</th>
-                  <th scope="col">Last Update</th>
+                  
               </tr>
           </thead>
           <tbody>
-              <% latestEntries.forEach((user, index) => { %>
-                  <tr>
-                      <td><%= index + 1 %></td>
-                      <td><%= user.clientSelect %></td>
-                      <td><%= user.selectbox === 'A_airtel' ? user.sent : '' %></td>
-                      <td><%= user.selectbox === 'M_airtel' ? user.sent : '' %></td>
-                      <td><%= user.selectbox === 'BSNL' ? user.sent : '' %></td>
-                      <td><%= new Date(user.createdAt).toLocaleString() %></td>
-                  </tr>
-              <% }); %>
+            <% latestEntries.forEach((user, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td><%= user._id %></td>
+                <td><%= user.A_airtel || '' %></td>
+                <td><%= user.M_airtel || '' %></td>
+                <td><%= user.BSNL || '' %></td>
+              </tr>
+            <% }); %>
           </tbody>
       </table>
       

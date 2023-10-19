@@ -81,55 +81,85 @@ app.get('/Queuereport', async (req, res) => {
 app.get('/sentReport', async (req, res) => {
   try {
     const selectedDate = req.query.date;
-    const selectedOperator = req.query.operator; // Get the operator from the query parameters
-  const fmd=await FormData.find({});
-  console.log(fmd);
+   
+    const selectedOperator = req.query.operator;
+   
+    const fmd = await FormData.find({});
+    
+    
     let pipeline = [
       {
         $sort: { lastUpdate: 1 }
       },
       {
         $group: {
-          _id: { selectbox: '$selectbox', clientSelect: '$clientSelect' },
+          _id: {
+            clientSelect: '$clientSelect',
+            selectbox: '$selectbox'
+          },
           latestEntry: { $last: '$$ROOT' }
         }
       },
       {
         $replaceRoot: { newRoot: '$latestEntry' }
+      },
+      {
+        $group: {
+          _id: '$clientSelect',
+          latestEntries: { $push: { selectbox: '$selectbox', sent: '$sent', lastUpdate: '$lastUpdate' } }
+        }
       }
     ];
-
+   
     if (selectedDate) {
+      startDate = new Date(selectedDate);
+      console.log("namste");
       pipeline = [
         {
           $match: {
             createdAt: {
               $gte: new Date(selectedDate),
               $lt: new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
+           
             }
           }
         },
-        ...pipeline // Include the previous stages for filtering
+        ...pipeline
       ];
     }
-
+   
+   
     if (selectedOperator) {
       pipeline = [
         {
           $match: {
-            selectbox: selectedOperator // Filter by the specified operator
+            'latestEntries.selectbox': selectedOperator
           },
-          ...pipeline // Include the previous stages for filtering
-        }];
+          ...pipeline
+        }
+      ];
     }
 
     const latestEntries = await FormData.aggregate(pipeline);
+    
+    // Now, process the latestEntries to fill in empty values with new entries
+    const processedEntries = latestEntries.map(entry => {
+      const filledEntry = { ...entry }; // Create a copy of the entry to avoid modifying the original
+      filledEntry.latestEntries.forEach(selectboxEntry => {
+        if (selectboxEntry.sent !== undefined && selectboxEntry.sent !== null) {
+          filledEntry[selectboxEntry.selectbox] = selectboxEntry.sent;
+        }
+      });
+      return filledEntry;
+    });
 
-    // Calculate the total "Sent" value for the specified operator
-    const totalSent = latestEntries.reduce((total, entry) => total + entry.sent, 0);
+    const totalSent = processedEntries.reduce((total, entry) => total + entry.sent, 0);
+
+
+
 
     // Render a new view with the total value
-    res.render('sentreport', { latestEntries, totalSent, selectedOperator });
+    res.render('sentreport', { latestEntries: processedEntries,totalSent, selectedOperator });
   } catch (error) {
     console.log(error);
   }
