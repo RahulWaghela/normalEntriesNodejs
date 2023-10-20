@@ -91,11 +91,16 @@ app.get('/sentReport', async (req, res) => {
 
     const getSimData = await Telecom.find();
     const airtel_A_100 = getSimData.map(entry => entry.airtel_A * 100);
+    const airtel_M_100 = getSimData.map(entry => entry.airtel_M * 100);
+    const BSNL_100 = getSimData.map(entry => entry.BSNL * 100);
+    
 
     const lastAirtel_A_100 = airtel_A_100[airtel_A_100.length - 1];
+    const lastAirtel_M_100 = airtel_A_100[airtel_M_100.length - 1];
     // console.log('Last Airtel_A*100:', lastAirtel_A_100);
-  
-
+    
+    const lastBSNL_100 = airtel_A_100[BSNL_100.length - 1];
+    
 
 
 
@@ -176,7 +181,9 @@ app.get('/sentReport', async (req, res) => {
     // console.log('Total M_airtel:', totalAirtel_M);
     // console.log('Total BSNL:', totalBSNL);
   
-   const subtractedVAl= totalAirtel_A-lastAirtel_A_100;
+   const subtractedVAl1= totalAirtel_A-lastAirtel_A_100;
+   const subtractedVAl2= totalAirtel_M-lastAirtel_M_100;
+   const subtractedVAl3= totalBSNL-lastBSNL_100;
 
     // Now, process the latestEntries to fill in empty values with new entries
     const processedEntries = latestEntries.map((entry) => {
@@ -190,7 +197,7 @@ app.get('/sentReport', async (req, res) => {
     });
 
     // Render a new view with the total values
-    res.render('sentreport', { latestEntries: processedEntries,subtractedVAl, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator,TotalOfALl});
+    res.render('sentreport', { latestEntries: processedEntries,subtractedVAl1,subtractedVAl2,subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator,TotalOfALl});
   } catch (error) {
     console.log(error);
   }
@@ -367,35 +374,51 @@ app.get('/DataSchedule', async (req, res) => {
 
 
 // total of all operator
-  app.get('/TofallSim', async (req, res) => {
-    try {
-      const showThisData = await FormData.find({});
+app.get('/TofallSim', async (req, res) => {
+  try {
+    const selectedDate = req.query.date;
 
-      let totalSentAirtelA = 0;
-      let totalSentAirtelM = 0;
-      let totalSentBsnl = 0;
+    // Convert the selected date to ISO format with a timestamp and timezone offset
+    const isoDate = selectedDate ? new Date(selectedDate + 'T00:00:00.000+00:00').toISOString() : undefined;
 
-      showThisData.forEach(data => {
-        if (data.selectbox === 'A_airtel' && data.sent !== null) {
-          totalSentAirtelA += data.sent;
-        }
-        if (data.selectbox === 'M_airtel' && data.sent !== null) {
-          totalSentAirtelM += data.sent;
-        }
-        if (data.selectbox === 'BSNL' && data.sent !== null) {
-          totalSentBsnl += data.sent;
-        }
-      });
+    const query = {};
 
-      // console.log('Total Sent for Airtel_A:', totalSentAirtelA);
-      // console.log('Total Sent for Airtel_M:', totalSentAirtelM);
-      // console.log('Total Sent for BSNL:', totalSentBsnl);
-
-      res.render('TofallSim',{totalSentAirtelA,totalSentAirtelM,totalSentBsnl});
-    } catch (error) {
-      console.log(error);
+    if (isoDate) {
+      query.date = isoDate;
     }
-  });
+
+    const showThisData = await FormData.find(query);
+
+    // Calculate totals as before
+    let totalSentAirtelA = 0;
+    let totalSentAirtelM = 0;
+    let totalSentBsnl = 0;
+
+    showThisData.forEach(data => {
+      if (data.selectbox === 'A_airtel' && data.sent !== null) {
+        totalSentAirtelA += data.sent;
+      }
+      if (data.selectbox === 'M_airtel' && data.sent !== null) {
+        totalSentAirtelM += data.sent;
+      }
+      if (data.selectbox === 'BSNL' && data.sent !== null) {
+        totalSentBsnl += data.sent;
+      }
+    });
+
+    res.render('TofallSim', {
+      totalSentAirtelA,
+      totalSentAirtelM,
+      totalSentBsnl,
+      selectedDate
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
 
 
 
