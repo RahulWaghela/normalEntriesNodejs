@@ -364,8 +364,9 @@ app.get('/DataSchedule', async (req, res) => {
       client: data.client,
       operator: data.operator,
       data: data.data,
-      date: data.date.toISOString().slice(0, 10)
-    }));
+      date: data.date ? data.date.toISOString().slice(0, 10) : null
+  }));
+  
 
     res.render('DataSchedule', { allUsers, dataSchedul: formattedDataSchedul });
   } catch (error) {
