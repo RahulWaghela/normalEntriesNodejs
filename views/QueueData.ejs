@@ -16,6 +16,12 @@
 
       <div class="container mt-5 p-4 shadow-lg w-50">
         <h2 class="text-center">Select a Client</h2>
+       
+
+        <% if (typeof error !== 'undefined') { %>
+          <p><%= error %></p>
+        <% } %>
+      
         <form action="/submit-form" method="post">
             <div class="form-group">
                 <label for="clientSelect">Select a client:</label>

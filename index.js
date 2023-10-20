@@ -2,7 +2,7 @@ const express = require('express')
 const app = express();
 const ejs = require('ejs');
 app.set('view engine', 'ejs');
-const port = 1870;
+const port = 9872;
 require('dotenv').config();
 require('./database/database');
 const { allDetailsofUser, FormData, Telecom,DataSchedul } = require('./model/schema');
@@ -49,103 +49,139 @@ app.get('/clients', async (req, res) => {
 
 // queue get Request Starts
 app.get('/Queuereport', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * ITEMS_PER_PAGE;
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const skip = (page - 1) * ITEMS_PER_PAGE;
 
-    // Query the database to get all records sorted by createdAt
-    const allUsersInDB = await FormData.find({}).sort({ createdAt: -1 });
+        // Retrieve the start and end date from the request query
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
 
-    // Calculate the total count of records
-    const totalCount = allUsersInDB.length;
+        // Build a query object to filter by date range
+        const dateFilter = {};
+        if (startDate && endDate) {
+            dateFilter.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+        }
 
-    // Slice the records to get the current page
-    const allUsersForPage = allUsersInDB.slice(skip, skip + ITEMS_PER_PAGE);
+        // Query the database to get records that match the date range
+        const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1 });
 
-    res.render('Queuereport', {
-      allUsersInDB: allUsersForPage,
-      currentPage: page,
-      ITEMS_PER_PAGE,
-      totalCount, // Pass the total count of records to the template
-    });
-  } catch (error) {
-    console.log(error);
-  }
+        // Calculate the total count of filtered records
+        const totalCount = allUsersInDB.length;
+
+        // Slice the records to get the current page
+        const allUsersForPage = allUsersInDB.slice(skip, skip + ITEMS_PER_PAGE);
+
+        res.render('Queuereport', {
+            allUsersInDB: allUsersForPage,
+            currentPage: page,
+            ITEMS_PER_PAGE,
+            totalCount, // Pass the total count of records to the template
+        });
+    } catch (error) {
+        console.log(error);
+    }
 });
-
-
-
 // queue get Request Ends
 
 
 app.get('/sentReport', async (req, res) => {
   try {
+
+
+    const getSimData = await Telecom.find();
+    const airtel_A_100 = getSimData.map(entry => entry.airtel_A * 100);
+
+    const lastAirtel_A_100 = airtel_A_100[airtel_A_100.length - 1];
+    // console.log('Last Airtel_A*100:', lastAirtel_A_100);
+  
+
+
+
+
     const selectedDate = req.query.date;
-   
     const selectedOperator = req.query.operator;
-   
-    const fmd = await FormData.find({});
-    
-    
+
     let pipeline = [
-      {
-        $sort: { lastUpdate: 1 }
-      },
       {
         $group: {
           _id: {
             clientSelect: '$clientSelect',
-            selectbox: '$selectbox'
+            selectbox: '$selectbox',
           },
-          latestEntry: { $last: '$$ROOT' }
-        }
+          latestEntry: { $last: '$$ROOT' },
+        },
       },
       {
-        $replaceRoot: { newRoot: '$latestEntry' }
+        $replaceRoot: { newRoot: '$latestEntry' },
       },
       {
         $group: {
           _id: '$clientSelect',
-          latestEntries: { $push: { selectbox: '$selectbox', sent: '$sent', lastUpdate: '$lastUpdate' } }
-        }
-      }
+          latestEntries: { $push: { selectbox: '$selectbox', sent: '$sent', lastUpdate: '$lastUpdate' } },
+        },
+      },
     ];
-   
+
     if (selectedDate) {
       startDate = new Date(selectedDate);
-      console.log("namste");
+      console.log("namaste");
       pipeline = [
         {
           $match: {
             createdAt: {
               $gte: new Date(selectedDate),
-              $lt: new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1))
-           
-            }
-          }
+              $lt: new Date(new Date(selectedDate).setDate(new Date(selectedDate).getDate() + 1)),
+            },
+          },
         },
-        ...pipeline
+        ...pipeline,
       ];
     }
-   
-   
+
     if (selectedOperator) {
       pipeline = [
         {
           $match: {
-            'latestEntries.selectbox': selectedOperator
+            'latestEntries.selectbox': selectedOperator,
           },
-          ...pipeline
-        }
+          ...pipeline,
+        },
       ];
     }
 
     const latestEntries = await FormData.aggregate(pipeline);
-    
+
+    // Calculate totals
+    let totalAirtel_A = 0;
+    let totalAirtel_M = 0;
+    let totalBSNL = 0;
+
+    latestEntries.forEach((entry) => {
+      entry.latestEntries.forEach((selectboxEntry) => {
+        if (selectboxEntry.sent !== undefined && selectboxEntry.sent !== null) {
+          if (selectboxEntry.selectbox === 'A_airtel') {
+            totalAirtel_A += selectboxEntry.sent;
+          } else if (selectboxEntry.selectbox === 'M_airtel') {
+            totalAirtel_M += selectboxEntry.sent;
+          } else if (selectboxEntry.selectbox === 'BSNL') {
+            totalBSNL += selectboxEntry.sent;
+          }
+        }
+      });
+    });
+   const TotalOfALl= totalAirtel_A+totalAirtel_M+totalBSNL;
+    // Console log totals
+    console.log('Total A_airtel:', totalAirtel_A);
+    // console.log('Total M_airtel:', totalAirtel_M);
+    // console.log('Total BSNL:', totalBSNL);
+  
+   const subtractedVAl= totalAirtel_A-lastAirtel_A_100;
+
     // Now, process the latestEntries to fill in empty values with new entries
-    const processedEntries = latestEntries.map(entry => {
+    const processedEntries = latestEntries.map((entry) => {
       const filledEntry = { ...entry }; // Create a copy of the entry to avoid modifying the original
-      filledEntry.latestEntries.forEach(selectboxEntry => {
+      filledEntry.latestEntries.forEach((selectboxEntry) => {
         if (selectboxEntry.sent !== undefined && selectboxEntry.sent !== null) {
           filledEntry[selectboxEntry.selectbox] = selectboxEntry.sent;
         }
@@ -153,13 +189,8 @@ app.get('/sentReport', async (req, res) => {
       return filledEntry;
     });
 
-    const totalSent = processedEntries.reduce((total, entry) => total + entry.sent, 0);
-
-
-
-
-    // Render a new view with the total value
-    res.render('sentreport', { latestEntries: processedEntries,totalSent, selectedOperator });
+    // Render a new view with the total values
+    res.render('sentreport', { latestEntries: processedEntries,subtractedVAl, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator,TotalOfALl});
   } catch (error) {
     console.log(error);
   }
@@ -263,7 +294,6 @@ app.get('/simData', async (req, res) => {
 
     // Fetch all Telecom documents from the database sorted by createdAt
     const telecomData = await Telecom.find().sort({ createdAt: -1 }).exec();
-
     // Calculate the total count of records
     const totalCount = telecomData.length;
 
@@ -333,9 +363,44 @@ app.get('/DataSchedule', async (req, res) => {
     console.log(error);
   }
 });
-
-
 // DataSchedule Ends
+
+
+// total of all operator
+  app.get('/TofallSim', async (req, res) => {
+    try {
+      const showThisData = await FormData.find({});
+
+      let totalSentAirtelA = 0;
+      let totalSentAirtelM = 0;
+      let totalSentBsnl = 0;
+
+      showThisData.forEach(data => {
+        if (data.selectbox === 'A_airtel' && data.sent !== null) {
+          totalSentAirtelA += data.sent;
+        }
+        if (data.selectbox === 'M_airtel' && data.sent !== null) {
+          totalSentAirtelM += data.sent;
+        }
+        if (data.selectbox === 'BSNL' && data.sent !== null) {
+          totalSentBsnl += data.sent;
+        }
+      });
+
+      // console.log('Total Sent for Airtel_A:', totalSentAirtelA);
+      // console.log('Total Sent for Airtel_M:', totalSentAirtelM);
+      // console.log('Total Sent for BSNL:', totalSentBsnl);
+
+      res.render('TofallSim',{totalSentAirtelA,totalSentAirtelM,totalSentBsnl});
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+
+
+// total of all operator
+
 
 app.listen(port, () => {
   console.log(`Server Running at http://localhost:${port}`);

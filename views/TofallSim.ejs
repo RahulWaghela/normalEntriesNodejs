@@ -33,59 +33,40 @@
 
 
   <div class="container mt-5 p-4 shadow-lg w-75">
-    <h2 class="text-center">Client list</h2>  
+    <h2 class="text-center">Total of All list</h2>
+  
+    <form method="GET" action="/TofallSim">
+      <div class="form-group">
+        <label for="date">Select Date:</label>
+        <input type="date" name="date" id="date" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">Filter by Date</button>
+    </form>
+  
     <table class="table table-hover">
       <thead>
         <tr>
-          <th scope="col">index</th>
-          <th scope="col">Client</th>
-          <!-- <th scope="col">Data</th> -->
-          <th scope="col">Sent</th>
-          <th scope="col">Queue</th>
-          <th scope="col">Operator</th>
-          <th scope="col">Pending</th>
-          <th scope="col">Last Update</th>
+          <th>Operator</th>
+          <th>Total Sent</th>
         </tr>
       </thead>
       <tbody>
-        <% allUsersInDB.forEach((user, index)=> { %>
-          <tr>
-            <td><%= (currentPage - 1) * ITEMS_PER_PAGE + index + 1 %></td>
-            <td>
-              <%= user.clientSelect %>
-            </td>
-            <!-- <td>
-              <%= user.data %>
-            </td> -->
-            <td>
-              <%= user.sent %>
-            </td>
-            <td>
-              <%= user.queue %>
-            </td>
-            <td>
-              <%= user.selectbox %>
-            </td>
-            <td>
-              <%= user.pending %>
-            </td>
-            <td>
-              <%= new Date(user.createdAt).toLocaleString() %>
-            </td>
-          </tr>
-        <% }); %>
+        <tr>
+          <td>A_airtel</td>
+          <td><%= totalSentAirtelA %></td>
+        </tr>
+        <tr>
+          <td>M_airtel</td>
+          <td><%= totalSentAirtelM %></td>
+        </tr>
+        <tr>
+          <td>Bsnl</td>
+          <td><%= totalSentBsnl %></td>
+        </tr>
       </tbody>
     </table>
-    <div class="pagination">
-      <% if (currentPage > 1) { %>
-          <a href="/Queuereport?page=<%= currentPage - 1 %>">Previous</a>
-      <% } %>
-      <% if (allUsersInDB.length === ITEMS_PER_PAGE) { %>
-          <a href="/Queuereport?page=<%= currentPage + 1 %>">Next</a>
-      <% } %>
   </div>
-    
-  </div>
+  
   
 
   

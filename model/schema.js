@@ -42,7 +42,7 @@ const temSchema = new mongoose.Schema({
 //  queue data Ends
 
 
-  // simData schema starts
+// simData schema starts
   const telecomSchema = new mongoose.Schema({
     airtel_A: {
       type: Number, // Change to Number
