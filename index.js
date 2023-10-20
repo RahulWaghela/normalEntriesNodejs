@@ -105,6 +105,7 @@ app.get('/sentReport', async (req, res) => {
 
 
     const selectedDate = req.query.date;
+  
     const selectedOperator = req.query.operator;
 
     let pipeline = [
@@ -184,7 +185,8 @@ app.get('/sentReport', async (req, res) => {
    const subtractedVAl1= totalAirtel_A-lastAirtel_A_100;
    const subtractedVAl2= totalAirtel_M-lastAirtel_M_100;
    const subtractedVAl3= totalBSNL-lastBSNL_100;
-
+   const total = subtractedVAl1+subtractedVAl2+subtractedVAl3;
+ const lastTotal=lastAirtel_A_100+lastAirtel_M_100+lastBSNL_100;
     // Now, process the latestEntries to fill in empty values with new entries
     const processedEntries = latestEntries.map((entry) => {
       const filledEntry = { ...entry }; // Create a copy of the entry to avoid modifying the original
@@ -197,7 +199,7 @@ app.get('/sentReport', async (req, res) => {
     });
 
     // Render a new view with the total values
-    res.render('sentreport', { latestEntries: processedEntries,subtractedVAl1,subtractedVAl2,subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator,TotalOfALl});
+    res.render('sentreport', { latestEntries: processedEntries,selectedDate,lastTotal,lastAirtel_A_100,lastAirtel_M_100,lastBSNL_100,total,subtractedVAl1,subtractedVAl2,subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator,TotalOfALl});
   } catch (error) {
     console.log(error);
   }

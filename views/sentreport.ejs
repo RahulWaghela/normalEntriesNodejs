@@ -22,16 +22,19 @@
       <!-- <div class="cont"> -->
 
         <!-- background-color: white;" -->
-    <div class="container mt-5 p-4 shadow-lg" style="width: 61%;">
+    <div class="container mt-5 p-4 shadow-lg" style="width: 50%;">
         <h2 class="text-center">Last update</h2>
+       
 
 
         <form action="/sentReport" method="get">
           <label for="selectedDate">Select Date:</label>
-          <input type="date" id="selectedDate" name="date">
-          <input type="submit" value="Filter">
+          <input type="date" id="selectedDate" name="date" value="<%= selectedDate %>">
+          <input id="semo" type="submit" value="Filter" onclick="showDate()">
         </form>
-
+       <script>
+       
+       </script>
         <table class="table table-hover">
           <thead>
               <tr>
@@ -66,7 +69,7 @@
 
 
 <!-- this is total of operator table -->
-<div class="container mt-5 p-4 shadow-lg" style="width: 30%">
+<div class="container mt-5 p-4 shadow-lg" style="width: 40%">
   <% // Calculate the total for A_airtel, M_airtel, and bsnl operators %>
   <% const totalAirtelA = latestEntries.filter(entry => entry.selectbox === 'A_airtel').reduce((total, entry) => total + entry.sent, 0); %>
   <% const totalAirtelM = latestEntries.filter(entry => entry.selectbox === 'M_airtel').reduce((total, entry) => total + entry.sent, 0); %>
@@ -78,6 +81,7 @@
       <th>Operator</th>
       <th>Total Sent</th>
       <th>SIM Data</th>
+      <th>Total SIM data</th>
     </tr>
   </thead>
   <tbody>
@@ -85,20 +89,26 @@
       <td>A_airtel</td>
       <td><%= totalAirtel_A %></td>
       <td><%= subtractedVAl1 %></td>
+      <td><%= lastAirtel_A_100 %></td>
+     
     </tr>
     <tr>
       <td>M_airtel</td>
       <td><%= totalAirtel_M %></td>
       <td><%= subtractedVAl2 %></td>
+      <td><%= lastAirtel_M_100 %></td>
     </tr>
     <tr>
       <td>Bsnl</td>
       <td><%= totalBSNL %></td>
       <td><%= subtractedVAl3 %></td>
+      <td><%= lastBSNL_100 %></td>
     </tr>
     <tr>
       <td>Total of All</td>
-  <td> <%= TotalOfALl %></td>
+      <td><%= TotalOfALl %></td>
+      <td><%= total %></td>
+      <td><%= lastTotal %></td>
     </tr>
 
     <!-- <tr>
