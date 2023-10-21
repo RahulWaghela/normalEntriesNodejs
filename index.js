@@ -385,45 +385,49 @@ app.get('/TofallSim', async (req, res) => {
   try {
     const selectedDate = req.query.date;
 
-    // Convert the selected date to ISO format with a timestamp and timezone offset
-    const isoDate = selectedDate ? new Date(selectedDate + 'T00:00:00.000+00:00').toISOString() : undefined;
-
-    const query = {};
-
-    if (isoDate) {
-      query.date = isoDate;
+    if (!selectedDate) {
+      // Handle case when no date is selected
+      return res.render('TofallSim', { totalSentAirtelA: 0, totalSentAirtelM: 0, totalSentBsnl: 0 });
     }
 
-    const showThisData = await FormData.find(query);
+    const formattedDate = new Date(selectedDate);
+    const endDate = new Date(formattedDate);
+    endDate.setDate(endDate.getDate() + 1); // Set the end date to the next day
 
-    // Calculate totals as before
-    let totalSentAirtelA = 0;
-    let totalSentAirtelM = 0;
-    let totalSentBsnl = 0;
+    const pipeline = [
+      {
+        $match: {
+          createdAt: {
+            $gte: formattedDate,
+            $lt: endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSentAirtelA: { $sum: { $cond: [{ $eq: ['$selectbox', 'A_airtel'] }, '$sent', 0] } },
+          totalSentAirtelM: { $sum: { $cond: [{ $eq: ['$selectbox', 'M_airtel'] }, '$sent', 0] } },
+          totalSentBsnl: { $sum: { $cond: [{ $eq: ['$selectbox', 'BSNL'] }, '$sent', 0] } },
+        },
+      },
+    ];
 
-    showThisData.forEach(data => {
-      if (data.selectbox === 'A_airtel' && data.sent !== null) {
-        totalSentAirtelA += data.sent;
-      }
-      if (data.selectbox === 'M_airtel' && data.sent !== null) {
-        totalSentAirtelM += data.sent;
-      }
-      if (data.selectbox === 'BSNL' && data.sent !== null) {
-        totalSentBsnl += data.sent;
-      }
-    });
+    const result = await FormData.aggregate(pipeline);
 
-    res.render('TofallSim', {
-      totalSentAirtelA,
-      totalSentAirtelM,
-      totalSentBsnl,
-      selectedDate
-    });
+    // Extract the totals from the result
+    const {
+      totalSentAirtelA = 0,
+      totalSentAirtelM = 0,
+      totalSentBsnl = 0,
+    } = result[0] || {};
+
+    res.render('TofallSim', { totalSentAirtelA,totalSentAirtelM, totalSentBsnl,selectedDate });
   } catch (error) {
-    console.log(error);
+    console.log('Error:', error);
+    res.status(500).send('An error occurred');
   }
 });
-
 
 
 
