@@ -78,7 +78,7 @@
               <tr>
                 <td><%= data.client %></td>
                 <td><%= data.operator %></td>
-                <td><%= data.data %></td>
+                <td><%= (data.data).toLocaleString() %></td>
                 <td><%= data.date %></td>
               </tr>
             <% }); %>
