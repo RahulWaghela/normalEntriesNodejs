@@ -131,13 +131,13 @@
               <tr>
                 <td><%= (currentPage - 1) * ITEMS_PER_PAGEs + index + 1 %></td>
                 <td>
-                  <%= data.airtel_A %>
+                  <%= data.airtel_A.toLocaleString() %>
                 </td>
                 <td>
-                  <%= data.airtel_M %>
+                  <%= data.airtel_M.toLocaleString() %>
                 </td>
                 <td>
-                  <%= data.BSNL %>
+                  <%= data.BSNL.toLocaleString() %>
                 </td>
                 <td>
                   <%= data.createdAt.toLocaleString() %>
