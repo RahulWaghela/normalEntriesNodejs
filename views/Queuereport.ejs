@@ -43,7 +43,7 @@
           <th scope="col">Sent</th>
           <th scope="col">Queue</th>
           <th scope="col">Operator</th>
-          <th scope="col">Pending</th>
+          
           <th scope="col">Last Update</th>
         </tr>
       </thead>
@@ -52,33 +52,33 @@
           <tr>
             <td><%= (currentPage - 1) * ITEMS_PER_PAGE + index + 1 %></td>
             <td>
-             <%= user.clientSelect %>
+
+              <%= user.clientSelect %>
             </td>
-            
+            <!-- <td>
+              <%= user.data %>
+            </td> -->
             <td>
-             <% if (user.sent && typeof user.sent === 'number') { %>
+              <% if (user.sent) { %>
                 <%= user.sent.toLocaleString() %>
-              <% } else if (user.sent) { %>
-                <%= user.sent %>
               <% } else { %>
-                N/A 
+                0
               <% } %>
+              
             </td>
+
             <td>
-              <% if (user.queue && typeof user.queue === 'number') { %>
+              <% if (user.queue) { %>
                 <%= user.queue.toLocaleString() %>
-              <% } else if (user.queue) { %>
-                <%= user.queue %>
               <% } else { %>
-                N/A 
+                0
               <% } %>
+              
             </td>
             <td>
               <%= user.selectbox %>
             </td>
-            <td>
-              <%= user.pending.toLocaleString() %>
-            </td>
+           
             <td>
               <%= new Date(user.createdAt).toLocaleString() %>
             </td>

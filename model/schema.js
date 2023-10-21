@@ -22,18 +22,22 @@ const temSchema = new mongoose.Schema({
     // },
     sent: {
       type:Number,
+      required :false,
     },
     queue: {
       type:Number,
+      required : false,
     },
     selectbox: {
       type: String,
-      enum: ['default', 'A_airtel', 'M_airtel', 'BSNL'],
-      default: 'default',
+      enum: ['default','A_airtel', 'M_airtel', 'BSNL'],
+      default :'default',
+     required : true,
     },
-    pending:{
-        type:Number
-    },
+    // pending:{
+    //     type:Number,
+    //     required:true,
+    // },
     createdAt: {
         type: Date,
         default: Date.now, // Set the default value to the current date and time
