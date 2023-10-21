@@ -22,8 +22,9 @@
         <form action="/submit-form" method="post">
             <div class="form-group">
                 <label for="clientSelect">Select a client:</label>
-                <select id="clientSelect" name="clientSelect">
-                  <% allUsers.forEach(user => { %>
+                <select id="clientSelect" name="clientSelect" >
+                 
+                  <% allUsers.forEach(user => { %> 
                     <option value="<%= user.name %>"><%= user.name %></option>
                   <% }); %>
                 </select>
@@ -44,7 +45,7 @@
             </div>
           
             <div class="form-group">
-              <select name="selectbox" id="">
+              <select name="selectbox" id="selectbox">
                 <option value="default">select</option>
                 <option value="A_airtel">A_airtel</option>
                 <option value="M_airtel">M_airtel</option>
@@ -61,7 +62,7 @@
           <% } %>
           </form>
           
-          
+             
     </div>
     
     <!-- Optional JavaScript -->

@@ -245,33 +245,36 @@ app.post('/submit-form', async (req, res) => {
     // Get the selected client's name
     const selectedClientName = req.body.clientSelect;
     console.log(selectedClientName);
-
+    
+    // console.log(typeof(req.body.selectbox));
     // Retrieve the "Data" value based on the selected user's name
-    const selectedClientData = req.body[`${selectedClientName}_data`];
-    console.log(selectedClientData);
+    // const selectedClientData = req.body[`${selectedClientName}_data`];
+    // console.log(selectedClientData);
 
     const { sent, queue } = req.body;
     if (!sent && !queue) {
       res.render('QueueData', { allUsers, error: "please filled sent or queue filed" });
-    } else {
-      const totalToOfPending = (sent + queue) - selectedClientData;
-
+    }else if (req.body.selectbox === 'default') {
+     res.render('QueueData', { allUsers, error: "Please select an option from the dropdown." });
+    } else{
       const formData = new FormData({
         clientSelect: selectedClientName,
-        data: selectedClientData, // Add the "Data" value to your FormData
-        sent: req.body.sent,
-        queue: req.body.queue,
+        sent,
+        queue,
         selectbox: req.body.selectbox,
-        pending: totalToOfPending
+
       });
       await formData.save();
       res.redirect("/Queuereport");
+    
     }
+      //const totalToOfPending = (Number(sent) + Number(queue)) - selectedClientData
+
 
   } catch (error) {
-    // console.error(error);
+    console.error(error);
     // res.status(500).send('Error saving form data.');
-    res.render('QueueData', { allUsers, error: "please filled all fields" });
+    // res.render('QueueData', { allUsers, error: "please filled all fields" });
   }
 });
 // queue Data post Request Ends
@@ -421,7 +424,7 @@ app.get('/TofallSim', async (req, res) => {
       totalSentAirtelM = 0,
       totalSentBsnl = 0,
     } = result[0] || {};
-
+    console.log(selectedDate);
     res.render('TofallSim', { totalSentAirtelA, totalSentAirtelM, totalSentBsnl, selectedDate });
   } catch (error) {
     console.log('Error:', error);

@@ -37,8 +37,8 @@
   
     <form method="GET" action="/TofallSim">
       <div class="form-group">
-        <label for="date">Select Date:</label>
-        <input type="date" name="date" id="date" value="<%=  %>" class="form-control" required pattern="\d{4}-\d{2}-\d{2}">
+        <label for="date">  </label>
+        <input type="date" name="date" id="date" value="" class="form-control" required pattern="\d{4}-\d{2}-\d{2}">
       </div>
       
       <button type="submit" class="btn btn-primary">Filter by Date</button>
@@ -72,7 +72,13 @@
 
   
 
-
+  <script>
+    // Check if selectedDate is defined
+    var selectedDate = '<%= typeof selectedDate !== "undefined" ? selectedDate : "" %>';
+    
+    // Set the input field's value based on the condition
+    document.getElementById('date').value = selectedDate;
+  </script>
 
 
 
