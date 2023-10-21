@@ -240,6 +240,7 @@ app.post('/sendInDatabase', async (req, res) => {
 
 // queue Data post Request Starts
 app.post('/submit-form', async (req, res) => {
+  const allUsers = await allDetailsofUser.find();
   try {
     // Get the selected client's name
     const selectedClientName = req.body.clientSelect;
@@ -250,7 +251,9 @@ app.post('/submit-form', async (req, res) => {
     console.log(selectedClientData);
 
     const { sent, queue } = req.body;
-
+    if(!sent && !queue){
+      res.render('QueueData',{ allUsers, error:"please filled sent or queue filed" });
+     }
     console.log(`sent ${sent} and queue ${queue}`);
 
     const totalToOfPending = (sent + queue) - selectedClientData;
@@ -266,8 +269,9 @@ app.post('/submit-form', async (req, res) => {
     await formData.save();
     res.redirect("/Queuereport");
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error saving form data.');
+    // console.error(error);
+    // res.status(500).send('Error saving form data.');
+    res.render('QueueData',{ allUsers, error:"please filled all fields" });
   }
 });
 // queue Data post Request Ends

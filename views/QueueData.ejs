@@ -18,10 +18,7 @@
         <h2 class="text-center">Select a Client</h2>
        
 
-        <% if (typeof error !== 'undefined') { %>
-          <p><%= error %></p>
-        <% } %>
-      
+       
         <form action="/submit-form" method="post">
             <div class="form-group">
                 <label for="clientSelect">Select a client:</label>
@@ -57,6 +54,11 @@
           
             <button>submit</button>
             <!-- Other form elements... -->
+            <% if (typeof error !== 'undefined' && error) { %>
+              <div class="error-message" style="color:red">
+                  <%= error %>
+              </div>
+          <% } %>
           </form>
           
           
