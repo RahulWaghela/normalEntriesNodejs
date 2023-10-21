@@ -5,7 +5,7 @@ app.set('view engine', 'ejs');
 const port = 9872;
 require('dotenv').config();
 require('./database/database');
-const { allDetailsofUser, FormData, Telecom,DataSchedul } = require('./model/schema');
+const { allDetailsofUser, FormData, Telecom, DataSchedul } = require('./model/schema');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,38 +49,38 @@ app.get('/clients', async (req, res) => {
 
 // queue get Request Starts
 app.get('/Queuereport', async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const skip = (page - 1) * ITEMS_PER_PAGE;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * ITEMS_PER_PAGE;
 
-        // Retrieve the start and end date from the request query
-        const startDate = req.query.startDate;
-        const endDate = req.query.endDate;
+    // Retrieve the start and end date from the request query
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
 
-        // Build a query object to filter by date range
-        const dateFilter = {};
-        if (startDate && endDate) {
-            dateFilter.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
-        }
-
-        // Query the database to get records that match the date range
-        const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1 });
-
-        // Calculate the total count of filtered records
-        const totalCount = allUsersInDB.length;
-
-        // Slice the records to get the current page
-        const allUsersForPage = allUsersInDB.slice(skip, skip + ITEMS_PER_PAGE);
-
-        res.render('Queuereport', {
-            allUsersInDB: allUsersForPage,
-            currentPage: page,
-            ITEMS_PER_PAGE,
-            totalCount, // Pass the total count of records to the template
-        });
-    } catch (error) {
-        console.log(error);
+    // Build a query object to filter by date range
+    const dateFilter = {};
+    if (startDate && endDate) {
+      dateFilter.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
     }
+
+    // Query the database to get records that match the date range
+    const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1 });
+
+    // Calculate the total count of filtered records
+    const totalCount = allUsersInDB.length;
+
+    // Slice the records to get the current page
+    const allUsersForPage = allUsersInDB.slice(skip, skip + ITEMS_PER_PAGE);
+
+    res.render('Queuereport', {
+      allUsersInDB: allUsersForPage,
+      currentPage: page,
+      ITEMS_PER_PAGE,
+      totalCount, // Pass the total count of records to the template
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 // queue get Request Ends
 
@@ -93,19 +93,19 @@ app.get('/sentReport', async (req, res) => {
     const airtel_A_100 = getSimData.map(entry => entry.airtel_A * 100);
     const airtel_M_100 = getSimData.map(entry => entry.airtel_M * 100);
     const BSNL_100 = getSimData.map(entry => entry.BSNL * 100);
-    
+
 
     const lastAirtel_A_100 = airtel_A_100[airtel_A_100.length - 1];
     const lastAirtel_M_100 = airtel_A_100[airtel_M_100.length - 1];
     // console.log('Last Airtel_A*100:', lastAirtel_A_100);
-    
+
     const lastBSNL_100 = airtel_A_100[BSNL_100.length - 1];
-    
+
 
 
 
     const selectedDate = req.query.date;
-  
+
     const selectedOperator = req.query.operator;
 
     let pipeline = [
@@ -176,17 +176,17 @@ app.get('/sentReport', async (req, res) => {
         }
       });
     });
-   const TotalOfALl= totalAirtel_A+totalAirtel_M+totalBSNL;
+    const TotalOfALl = totalAirtel_A + totalAirtel_M + totalBSNL;
     // Console log totals
     console.log('Total A_airtel:', totalAirtel_A);
     // console.log('Total M_airtel:', totalAirtel_M);
     // console.log('Total BSNL:', totalBSNL);
-  
-   const subtractedVAl1= totalAirtel_A-lastAirtel_A_100;
-   const subtractedVAl2= totalAirtel_M-lastAirtel_M_100;
-   const subtractedVAl3= totalBSNL-lastBSNL_100;
-   const total = subtractedVAl1+subtractedVAl2+subtractedVAl3;
- const lastTotal=lastAirtel_A_100+lastAirtel_M_100+lastBSNL_100;
+
+    const subtractedVAl1 = totalAirtel_A - lastAirtel_A_100;
+    const subtractedVAl2 = totalAirtel_M - lastAirtel_M_100;
+    const subtractedVAl3 = totalBSNL - lastBSNL_100;
+    const total = subtractedVAl1 + subtractedVAl2 + subtractedVAl3;
+    const lastTotal = lastAirtel_A_100 + lastAirtel_M_100 + lastBSNL_100;
     // Now, process the latestEntries to fill in empty values with new entries
     const processedEntries = latestEntries.map((entry) => {
       const filledEntry = { ...entry }; // Create a copy of the entry to avoid modifying the original
@@ -199,7 +199,7 @@ app.get('/sentReport', async (req, res) => {
     });
 
     // Render a new view with the total values
-    res.render('sentreport', { latestEntries: processedEntries,selectedDate,lastTotal,lastAirtel_A_100,lastAirtel_M_100,lastBSNL_100,total,subtractedVAl1,subtractedVAl2,subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator,TotalOfALl});
+    res.render('sentreport', { latestEntries: processedEntries, selectedDate, lastTotal, lastAirtel_A_100, lastAirtel_M_100, lastBSNL_100, total, subtractedVAl1, subtractedVAl2, subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator, TotalOfALl });
   } catch (error) {
     console.log(error);
   }
@@ -251,27 +251,27 @@ app.post('/submit-form', async (req, res) => {
     console.log(selectedClientData);
 
     const { sent, queue } = req.body;
-    if(!sent && !queue){
-      res.render('QueueData',{ allUsers, error:"please filled sent or queue filed" });
-     }
-    console.log(`sent ${sent} and queue ${queue}`);
+    if (!sent && !queue) {
+      res.render('QueueData', { allUsers, error: "please filled sent or queue filed" });
+    } else {
+      const totalToOfPending = (sent + queue) - selectedClientData;
 
-    const totalToOfPending = (sent + queue) - selectedClientData;
+      const formData = new FormData({
+        clientSelect: selectedClientName,
+        data: selectedClientData, // Add the "Data" value to your FormData
+        sent: req.body.sent,
+        queue: req.body.queue,
+        selectbox: req.body.selectbox,
+        pending: totalToOfPending
+      });
+      await formData.save();
+      res.redirect("/Queuereport");
+    }
 
-    const formData = new FormData({
-      clientSelect: selectedClientName,
-      data: selectedClientData, // Add the "Data" value to your FormData
-      sent: req.body.sent,
-      queue: req.body.queue,
-      selectbox: req.body.selectbox,
-      pending: totalToOfPending
-    });
-    await formData.save();
-    res.redirect("/Queuereport");
   } catch (error) {
     // console.error(error);
     // res.status(500).send('Error saving form data.');
-    res.render('QueueData',{ allUsers, error:"please filled all fields" });
+    res.render('QueueData', { allUsers, error: "please filled all fields" });
   }
 });
 // queue Data post Request Ends
@@ -369,8 +369,8 @@ app.get('/DataSchedule', async (req, res) => {
       operator: data.operator,
       data: data.data,
       date: data.date ? data.date.toISOString().slice(0, 10) : null
-  }));
-  
+    }));
+
 
     res.render('DataSchedule', { allUsers, dataSchedul: formattedDataSchedul });
   } catch (error) {
@@ -422,7 +422,7 @@ app.get('/TofallSim', async (req, res) => {
       totalSentBsnl = 0,
     } = result[0] || {};
 
-    res.render('TofallSim', { totalSentAirtelA,totalSentAirtelM, totalSentBsnl,selectedDate });
+    res.render('TofallSim', { totalSentAirtelA, totalSentAirtelM, totalSentBsnl, selectedDate });
   } catch (error) {
     console.log('Error:', error);
     res.status(500).send('An error occurred');
