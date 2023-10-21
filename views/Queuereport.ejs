@@ -52,7 +52,13 @@
           <tr>
             <td><%= (currentPage - 1) * ITEMS_PER_PAGE + index + 1 %></td>
             <td>
-              <%= user.clientSelect %>
+              <% if (user.sent && typeof user.sent === 'number') { %>
+                <%= user.sent.toLocaleString() %>
+              <% } else if (user.sent) { %>
+                <%= user.sent %>
+              <% } else { %>
+                N/A 
+              <% } %>
             </td>
             <!-- <td>
               <%= user.data %>
@@ -61,13 +67,19 @@
               <%= user.sent %>
             </td>
             <td>
-              <%= user.queue %>
+              <% if (user.queue && typeof user.queue === 'number') { %>
+                <%= user.queue.toLocaleString() %>
+              <% } else if (user.queue) { %>
+                <%= user.queue %>
+              <% } else { %>
+                N/A 
+              <% } %>
             </td>
             <td>
               <%= user.selectbox %>
             </td>
             <td>
-              <%= user.pending %>
+              <%= user.pending.toLocaleString() %>
             </td>
             <td>
               <%= new Date(user.createdAt).toLocaleString() %>
