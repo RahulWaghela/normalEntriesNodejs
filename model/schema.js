@@ -22,9 +22,11 @@ const temSchema = new mongoose.Schema({
     // },
     sent: {
       type:Number,
+      required :true,
     },
     queue: {
       type:Number,
+      required : true,
     },
     selectbox: {
       type: String,
@@ -32,7 +34,8 @@ const temSchema = new mongoose.Schema({
       default: 'default',
     },
     pending:{
-        type:Number
+        type:Number,
+        required:true,
     },
     createdAt: {
         type: Date,
