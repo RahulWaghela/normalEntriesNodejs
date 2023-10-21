@@ -418,7 +418,7 @@ app.get('/TofallSim', async (req, res) => {
       totalSentBsnl = 0,
     } = result[0] || {};
 
-    res.render('TofallSim', { totalSentAirtelA,selectedDate, totalSentAirtelM, totalSentBsnl });
+    res.render('TofallSim', { totalSentAirtelA,totalSentAirtelM, totalSentBsnl,selectedDate });
   } catch (error) {
     console.log('Error:', error);
     res.status(500).send('An error occurred');
