@@ -24,6 +24,12 @@ const ITEMS_PER_PAGE = 10; // Number of records to display per page
 
 app.get('/clients', async (req, res) => {
   try {
+    let sortOrder = 1;
+
+    // Check the 'sort' query parameter to determine the sorting order
+    if (req.query.sort === '-username') {
+      sortOrder = -1; // Descending order
+    }
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
@@ -32,6 +38,16 @@ app.get('/clients', async (req, res) => {
       .skip(skip)
       .limit(ITEMS_PER_PAGE);
 
+
+      if (req.query.sort === 'username' || req.query.sort === '-username') {
+        allUsers.sort((a, b) => {
+          const clientA = a.name.toLowerCase();
+          const clientB = b.name.toLowerCase();
+          if (clientA < clientB) return -sortOrder;
+          if (clientA > clientB) return sortOrder;
+          return 0;
+        });
+      }
     res.render('clients', { allUsers, currentPage: page, ITEMS_PER_PAGE }); // Pass 'ITEMS_PER_PAGE' to the 'clients' template
   } catch (error) {
     console.error('Failed to fetch data', error);
