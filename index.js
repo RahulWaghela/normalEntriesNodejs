@@ -402,9 +402,23 @@ app.post('/sendDetailsToServer', async (req, res) => {
 
 app.get('/DataSchedule', async (req, res) => {
   try {
+    let sortOrder = 1;
+
+    // Check the 'sort' query parameter to determine the sorting order
+    if (req.query.sort === '-username') {
+      sortOrder = -1; // Descending order
+    }
     const allUsers = await allDetailsofUser.find();
     const dataSchedul = await DataSchedul.find();
-
+    if (req.query.sort === 'username' || req.query.sort === '-username') {
+      dataSchedul.sort((a, b) => {
+        const clientA = a.client.toLowerCase();
+        const clientB = b.client.toLowerCase();
+        if (clientA < clientB) return -sortOrder;
+        if (clientA > clientB) return sortOrder;
+        return 0;
+      });
+    }
     // Format the date and remove the time and timezone information
     const formattedDataSchedul = dataSchedul.map(data => ({
       client: data.client,
