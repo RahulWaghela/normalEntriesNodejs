@@ -50,6 +50,12 @@ app.get('/clients', async (req, res) => {
 // queue get Request Starts
 app.get('/Queuereport', async (req, res) => {
   try {
+    let sortOrder = 1;
+
+    // Check the 'sort' query parameter to determine the sorting order
+    if (req.query.sort === '-username') {
+      sortOrder = -1; // Descending order
+    }
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
@@ -64,11 +70,21 @@ app.get('/Queuereport', async (req, res) => {
     }
 
     // Query the database to get records that match the date range
-    const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1 });
-
+    // const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1, clientSelect : sortOrder  });
+    const allUsersInDB = await FormData.find(dateFilter);
+    // console.log(allUsersInDB);
     // Calculate the total count of filtered records
-    const totalCount = allUsersInDB.length;
-
+    // const totalCount = allUsersInDB.length;
+    // Sort the data based on the clientSelect field when 'sort' is provided
+    if (req.query.sort === 'username' || req.query.sort === '-username') {
+      allUsersInDB.sort((a, b) => {
+        const clientA = a.clientSelect.toLowerCase();
+        const clientB = b.clientSelect.toLowerCase();
+        if (clientA < clientB) return -sortOrder;
+        if (clientA > clientB) return sortOrder;
+        return 0;
+      });
+    }
     // Slice the records to get the current page
     const allUsersForPage = allUsersInDB.slice(skip, skip + ITEMS_PER_PAGE);
 
@@ -76,8 +92,10 @@ app.get('/Queuereport', async (req, res) => {
       allUsersInDB: allUsersForPage,
       currentPage: page,
       ITEMS_PER_PAGE,
-      totalCount, // Pass the total count of records to the template
+      // totalCount, // Pass the total count of records to the template
+      sort: req.query.sort || 'createdAt',
     });
+
   } catch (error) {
     console.log(error);
   }
@@ -155,6 +173,11 @@ app.get('/sentReport', async (req, res) => {
         },
       ];
     }
+// Add a $sort stage to sort the results by clientSelect
+// const sortValue = req.query.sort === '-clientSelect' ? -1 : 1; // Toggle between ascending and descending
+// pipeline.push({
+//   $sort: { clientSelect: sortValue }
+// });
 
     const latestEntries = await FormData.aggregate(pipeline);
 
@@ -245,7 +268,7 @@ app.post('/submit-form', async (req, res) => {
     // Get the selected client's name
     const selectedClientName = req.body.clientSelect;
     console.log(selectedClientName);
-    
+
     // console.log(typeof(req.body.selectbox));
     // Retrieve the "Data" value based on the selected user's name
     // const selectedClientData = req.body[`${selectedClientName}_data`];
@@ -254,9 +277,9 @@ app.post('/submit-form', async (req, res) => {
     const { sent, queue } = req.body;
     if (!sent && !queue) {
       res.render('QueueData', { allUsers, error: "please filled sent or queue filed" });
-    }else if (req.body.selectbox === 'default') {
-     res.render('QueueData', { allUsers, error: "Please select an option from the dropdown." });
-    } else{
+    } else if (req.body.selectbox === 'default') {
+      res.render('QueueData', { allUsers, error: "Please select an option from the dropdown." });
+    } else {
       const formData = new FormData({
         clientSelect: selectedClientName,
         sent,
@@ -266,9 +289,9 @@ app.post('/submit-form', async (req, res) => {
       });
       await formData.save();
       res.redirect("/Queuereport");
-    
+
     }
-      //const totalToOfPending = (Number(sent) + Number(queue)) - selectedClientData
+    //const totalToOfPending = (Number(sent) + Number(queue)) - selectedClientData
 
 
   } catch (error) {
