@@ -72,6 +72,16 @@ app.get('/Queuereport', async (req, res) => {
     if (req.query.sort === '-username') {
       sortOrder = -1; // Descending order
     }
+
+
+    let sortorder = 1;
+
+    // Check the 'sort' query parameter to determine the sorting order
+    if (req.query.sort === '-selectbox') {
+      sortorder = -1; // Descending order
+    }
+
+
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
@@ -99,6 +109,38 @@ app.get('/Queuereport', async (req, res) => {
         if (clientA < clientB) return -sortOrder;
         if (clientA > clientB) return sortOrder;
         return 0;
+      });
+    }
+    if (req.query.sort === 'selectbox' || req.query.sort === '-selectbox') {
+      allUsersInDB.sort((a, b) => {
+        const clientA = a.selectbox.toLowerCase();
+        const clientB = b.selectbox.toLowerCase();
+        if (clientA < clientB) return -sortorder;
+        if (clientA > clientB) return sortorder;
+        return 0;
+      });
+    }
+
+    if (req.query.sort === 'sent' || req.query.sort === '-sent') {
+      allUsersInDB.sort((a, b) => {
+        const dataA = a.sent;
+        const dataB = b.sent;
+        if (req.query.sort === 'sent') {
+          return dataA - dataB; // Sort by data ascending
+        } else if (req.query.sort === '-sent') {
+          return dataB - dataA; // Sort by data descending
+        }
+      });
+    }
+    if (req.query.sort === 'queue' || req.query.sort === '-queue') {
+      allUsersInDB.sort((a, b) => {
+        const dataA = a.queue;
+        const dataB = b.queue;
+        if (req.query.sort === 'queue') {
+          return dataA - dataB; // Sort by data ascending
+        } else if (req.query.sort === '-queue') {
+          return dataB - dataA; // Sort by data descending
+        }
       });
     }
     // Slice the records to get the current page
@@ -344,11 +386,50 @@ const ITEMS_PER_PAGEs = 5; // Number of records to display per page
 
 app.get('/simData', async (req, res) => {
   try {
+
+
     const page = parseInt(req.query.page) || 1; // Get the requested page number from query params
     const skip = (page - 1) * ITEMS_PER_PAGEs;
 
     // Fetch all Telecom documents from the database sorted by createdAt
-    const telecomData = await Telecom.find().sort({ createdAt: -1 }).exec();
+    // const telecomData = await Telecom.find().sort({ createdAt: -1 }).exec();
+    const telecomData = await Telecom.find({});
+    if (req.query.sort === 'airtel_A' || req.query.sort === '-airtel_A') {
+      telecomData.sort((a, b) => {
+        const dataA = a.airtel_A;
+        const dataB = b.airtel_A;
+        
+        if (req.query.sort === 'airtel_A') {
+          return dataA - dataB; // Sort by data ascending
+        } else if (req.query.sort === '-airtel_A') {
+          return dataB - dataA; // Sort by data descending
+        }
+      });
+    }
+    if (req.query.sort === 'airtel_M' || req.query.sort === '-airtel_M') {
+      telecomData.sort((a, b) => {
+        const dataA = a.airtel_M;
+        const dataB = b.airtel_M;
+        
+        if (req.query.sort === 'airtel_M') {
+          return dataA - dataB; // Sort by data ascending
+        } else if (req.query.sort === '-airtel_M') {
+          return dataB - dataA; // Sort by data descending
+        }
+      });
+    }
+    if (req.query.sort === 'BSNL' || req.query.sort === '-BSNL') {
+      telecomData.sort((a, b) => {
+        const dataA = a.BSNL;
+        const dataB = b.BSNL;
+        
+        if (req.query.sort === 'BSNL') {
+          return dataA - dataB; // Sort by data ascending
+        } else if (req.query.sort === '-BSNL') {
+          return dataB - dataA; // Sort by data descending
+        }
+      });
+    }
     // Calculate the total count of records
     const totalCount = telecomData.length;
 
@@ -408,6 +489,12 @@ app.get('/DataSchedule', async (req, res) => {
     if (req.query.sort === '-username') {
       sortOrder = -1; // Descending order
     }
+    let sortorder = 1;
+
+    // Check the 'sort' query parameter to determine the sorting order
+    if (req.query.sort === '-operator') {
+      sortorder = -1; // Descending order
+    }
     const allUsers = await allDetailsofUser.find();
     const dataSchedul = await DataSchedul.find();
     if (req.query.sort === 'username' || req.query.sort === '-username') {
@@ -419,6 +506,31 @@ app.get('/DataSchedule', async (req, res) => {
         return 0;
       });
     }
+
+    if (req.query.sort === 'operator' || req.query.sort === '-operator') {
+      dataSchedul.sort((a, b) => {
+        const clientA = a.operator.toLowerCase();
+        const clientB = b.operator.toLowerCase();
+        if (clientA < clientB) return -sortorder;
+        if (clientA > clientB) return sortorder;
+        return 0;
+      });
+    }
+
+    
+    if (req.query.sort === 'data' || req.query.sort === '-data') {
+      dataSchedul.sort((a, b) => {
+        const dataA = a.data;
+        const dataB = b.data;
+        
+        if (req.query.sort === 'data') {
+          return dataA - dataB; // Sort by data ascending
+        } else if (req.query.sort === '-data') {
+          return dataB - dataA; // Sort by data descending
+        }
+      });
+    }
+    
     // Format the date and remove the time and timezone information
     const formattedDataSchedul = dataSchedul.map(data => ({
       client: data.client,
