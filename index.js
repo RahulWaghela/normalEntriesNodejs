@@ -666,17 +666,36 @@ app.get("/clientData", async (req, res) => {
 //   });
 // }
 // Sort the clientData array based on the selected sorting parameter
-if (sortOptions[sortParam]) {
-  if (sortParam.startsWith('-')) {
-    clientData.sort((a, b) =>
-      b[sortOptions[sortParam].substring(1)].localeCompare(a[sortOptions[sortParam].substring(1)], undefined, { sensitivity: 'base' })
-    );
-  } else {
-    clientData.sort((a, b) =>
-      a[sortOptions[sortParam]].localeCompare(b[sortOptions[sortParam]], undefined, { sensitivity: 'base' })
-    );
+// if (sortOptions[sortParam]) {
+//   if (sortParam.startsWith('-')) {
+//     clientData.sort((a, b) =>
+//       b[sortOptions[sortParam].substring(1)].localeCompare(a[sortOptions[sortParam].substring(1)], undefined, { sensitivity: 'base' })
+//     );
+//   } else {
+//     clientData.sort((a, b) =>
+//       a[sortOptions[sortParam]].localeCompare(b[sortOptions[sortParam]], undefined, { sensitivity: 'base' })
+//     );
+//   }
+// }
+
+   // Sort the clientData array based on the selected sorting parameter
+  if (sortParam === 'username') {
+    clientData.sort((a, b) => a.client.localeCompare(b.client, undefined, { sensitivity: 'base' }));
+  } else if (sortParam === '-username') {
+    clientData.sort((a, b) => b.client.localeCompare(a.client, undefined, { sensitivity: 'base' }));
+  } else if (sortParam === 'sim1') {
+    clientData.sort((a, b) => a.totalAirtelAData - b.totalAirtelAData);
+  } else if (sortParam === '-sim1') {
+    clientData.sort((a, b) => b.totalAirtelAData - a.totalAirtelAData);
+  } else if (sortParam === 'sim2') {
+    clientData.sort((a, b) => a.totalAirtelMData - b.totalAirtelMData);
+  } else if (sortParam === '-sim2') {
+    clientData.sort((a, b) => b.totalAirtelMData - a.totalAirtelMData);
+  } else if (sortParam === 'sim3') {
+    clientData.sort((a, b) => a.totalBsnlData - b.totalBsnlData);
+  } else if (sortParam === '-sim3') {
+    clientData.sort((a, b) => b.totalBsnlData - a.totalBsnlData);
   }
-}
   // console.log(clientData);
   res.render("clientData", { clientData, allUsers });
 });
