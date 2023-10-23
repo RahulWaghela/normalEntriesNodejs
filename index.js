@@ -312,7 +312,7 @@ app.post('/sendInDatabase', async (req, res) => {
 
     await saveAllRecordInDB.save();
     console.log(name);
-    res.redirect('/');
+    res.redirect('/clients');
   } catch (error) {
     console.error('failed to send', error);
     res.status(500).send('can not send to the server...');
