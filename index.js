@@ -609,36 +609,36 @@ app.get("/clientData", async (req, res) => {
   // Iterate through each client and calculate the total data from the FormData collection
   for (const user of allUsers) {
     const client = user.name;
-    console.log(client);
+    // console.log(client);
     const airtelAData = await FormData.aggregate([
       { $match: { clientSelect: client, selectbox: 'A_airtel' } },
       { $group: { _id: null, total: { $sum: '$sent' } } }
     ]);
-    console.log(airtelAData);
+    // console.log(airtelAData);
     const airtelMData = await FormData.aggregate([
       { $match: { clientSelect: client, selectbox: 'M_airtel' } },
       { $group: { _id: null, total: { $sum: '$sent' } } }
     ]);
-    console.log(airtelMData);
+    // console.log(airtelMData);
     const bsnlData = await FormData.aggregate([
       { $match: { clientSelect: client, selectbox: 'BSNL' } },
       { $group: { _id: null, total: { $sum: '$sent' } } }
     ]);
-    console.log(bsnlData);
+    // console.log(bsnlData);
 
     const totalAirtelAData = airtelAData.length > 0 ? airtelAData[0].total : 0;
-    console.log(totalAirtelAData);
+    // console.log(totalAirtelAData);
     const totalAirtelMData = airtelMData.length > 0 ? airtelMData[0].total : 0;
-    console.log(totalAirtelMData);
+    // console.log(totalAirtelMData);
     const totalBsnlData = bsnlData.length > 0 ? bsnlData[0].total : 0;
-    console.log(totalBsnlData);
+    // console.log(totalBsnlData);
     clientData.push({
       client: client,
       totalAirtelAData: totalAirtelAData,
       totalAirtelMData: totalAirtelMData,
       totalBsnlData: totalBsnlData
     });
-    console.log(clientData);
+    // console.log(clientData);
   }
 
   // console.log(clientData);
