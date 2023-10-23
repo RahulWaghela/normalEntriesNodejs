@@ -602,10 +602,24 @@ app.get("/clientData", async (req, res) => {
 
   // const clientData = await FormData.find({},'clientSelect sent selectbox');
   const allUsers = await allDetailsofUser.find({}, 'name');
+ 
   //  console.log(allUsers);
   //  console.log(clientData);
   // Create an array to store the calculated total data for each client
   const clientData = [];
+
+  // Sorting parameters for each column
+  const sortOptions = {
+    'username': 'client',
+    '-username': '-client',
+    'sim1': 'totalAirtelAData',
+    '-sim1': '-totalAirtelAData',
+    'sim2': 'totalAirtelMData',
+    '-sim2': '-totalAirtelMData',
+    'sim3': 'totalBsnlData',
+    '-sim3': '-totalBsnlData'
+  };
+  const sortParam = req.query.sort || 'username'; // Default sorting by client name
   // Iterate through each client and calculate the total data from the FormData collection
   for (const user of allUsers) {
     const client = user.name;
@@ -640,7 +654,16 @@ app.get("/clientData", async (req, res) => {
     });
     // console.log(clientData);
   }
-
+ // Sort the clientData array based on the selected sorting parameter
+ if (sortOptions[sortParam]) {
+  clientData.sort((a, b) => {
+    if (sortParam.startsWith('-')) {
+      return b[sortOptions[sortParam].substring(1)] - a[sortOptions[sortParam].substring(1)];
+    } else {
+      return a[sortOptions[sortParam]] - b[sortOptions[sortParam]];
+    }
+  });
+}
   // console.log(clientData);
   res.render("clientData", { clientData, allUsers });
 });
