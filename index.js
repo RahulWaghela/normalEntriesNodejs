@@ -39,15 +39,15 @@ app.get('/clients', async (req, res) => {
       .limit(ITEMS_PER_PAGE);
 
 
-      if (req.query.sort === 'username' || req.query.sort === '-username') {
-        allUsers.sort((a, b) => {
-          const clientA = a.name.toLowerCase();
-          const clientB = b.name.toLowerCase();
-          if (clientA < clientB) return -sortOrder;
-          if (clientA > clientB) return sortOrder;
-          return 0;
-        });
-      }
+    if (req.query.sort === 'username' || req.query.sort === '-username') {
+      allUsers.sort((a, b) => {
+        const clientA = a.name.toLowerCase();
+        const clientB = b.name.toLowerCase();
+        if (clientA < clientB) return -sortOrder;
+        if (clientA > clientB) return sortOrder;
+        return 0;
+      });
+    }
     res.render('clients', { allUsers, currentPage: page, ITEMS_PER_PAGE }); // Pass 'ITEMS_PER_PAGE' to the 'clients' template
   } catch (error) {
     console.error('Failed to fetch data', error);
@@ -231,11 +231,11 @@ app.get('/sentReport', async (req, res) => {
         },
       ];
     }
-// Add a $sort stage to sort the results by clientSelect
-// const sortValue = req.query.sort === '-clientSelect' ? -1 : 1; // Toggle between ascending and descending
-// pipeline.push({
-//   $sort: { clientSelect: sortValue }
-// });
+    // Add a $sort stage to sort the results by clientSelect
+    // const sortValue = req.query.sort === '-clientSelect' ? -1 : 1; // Toggle between ascending and descending
+    // pipeline.push({
+    //   $sort: { clientSelect: sortValue }
+    // });
 
     const latestEntries = await FormData.aggregate(pipeline);
 
@@ -398,7 +398,7 @@ app.get('/simData', async (req, res) => {
       telecomData.sort((a, b) => {
         const dataA = a.airtel_A;
         const dataB = b.airtel_A;
-        
+
         if (req.query.sort === 'airtel_A') {
           return dataA - dataB; // Sort by data ascending
         } else if (req.query.sort === '-airtel_A') {
@@ -410,7 +410,7 @@ app.get('/simData', async (req, res) => {
       telecomData.sort((a, b) => {
         const dataA = a.airtel_M;
         const dataB = b.airtel_M;
-        
+
         if (req.query.sort === 'airtel_M') {
           return dataA - dataB; // Sort by data ascending
         } else if (req.query.sort === '-airtel_M') {
@@ -422,7 +422,7 @@ app.get('/simData', async (req, res) => {
       telecomData.sort((a, b) => {
         const dataA = a.BSNL;
         const dataB = b.BSNL;
-        
+
         if (req.query.sort === 'BSNL') {
           return dataA - dataB; // Sort by data ascending
         } else if (req.query.sort === '-BSNL') {
@@ -517,12 +517,12 @@ app.get('/DataSchedule', async (req, res) => {
       });
     }
 
-    
+
     if (req.query.sort === 'data' || req.query.sort === '-data') {
       dataSchedul.sort((a, b) => {
         const dataA = a.data;
         const dataB = b.data;
-        
+
         if (req.query.sort === 'data') {
           return dataA - dataB; // Sort by data ascending
         } else if (req.query.sort === '-data') {
@@ -530,7 +530,7 @@ app.get('/DataSchedule', async (req, res) => {
         }
       });
     }
-    
+
     // Format the date and remove the time and timezone information
     const formattedDataSchedul = dataSchedul.map(data => ({
       client: data.client,
@@ -598,7 +598,52 @@ app.get('/TofallSim', async (req, res) => {
 });
 
 
+app.get("/clientData", async (req, res) => {
 
+  // const clientData = await FormData.find({},'clientSelect sent selectbox');
+  const allUsers = await allDetailsofUser.find({}, 'name');
+  //  console.log(allUsers);
+  //  console.log(clientData);
+  // Create an array to store the calculated total data for each client
+  const clientData = [];
+  // Iterate through each client and calculate the total data from the FormData collection
+  for (const user of allUsers) {
+    const client = user.name;
+    // console.log(client);
+    const airtelAData = await FormData.aggregate([
+      { $match: { clientSelect: client, selectbox: 'A_airtel' } },
+      { $group: { _id: null, total: { $sum: '$sent' } } }
+    ]);
+    // console.log(airtelAData);
+    const airtelMData = await FormData.aggregate([
+      { $match: { clientSelect: client, selectbox: 'M_airtel' } },
+      { $group: { _id: null, total: { $sum: '$sent' } } }
+    ]);
+    // console.log(airtelMData);
+    const bsnlData = await FormData.aggregate([
+      { $match: { clientSelect: client, selectbox: 'BSNL' } },
+      { $group: { _id: null, total: { $sum: '$sent' } } }
+    ]);
+    // console.log(bsnlData);
+
+    const totalAirtelAData = airtelAData.length > 0 ? airtelAData[0].total : 0;
+    // console.log(totalAirtelAData);
+    const totalAirtelMData = airtelMData.length > 0 ? airtelMData[0].total : 0;
+    // console.log(totalAirtelMData);
+    const totalBsnlData = bsnlData.length > 0 ? bsnlData[0].total : 0;
+    // console.log(totalBsnlData);
+    clientData.push({
+      client: client,
+      totalAirtelAData: totalAirtelAData,
+      totalAirtelMData: totalAirtelMData,
+      totalBsnlData: totalBsnlData
+    });
+    // console.log(clientData);
+  }
+
+  // console.log(clientData);
+  res.render("clientData", { clientData, allUsers });
+});
 
 
 // total of all operator
