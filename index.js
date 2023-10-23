@@ -620,6 +620,7 @@ app.get("/clientData", async (req, res) => {
     '-sim3': '-totalBsnlData'
   };
   const sortParam = req.query.sort || 'username'; // Default sorting by client name
+  // console.log(sortParam);
   // Iterate through each client and calculate the total data from the FormData collection
   for (const user of allUsers) {
     const client = user.name;
@@ -655,14 +656,26 @@ app.get("/clientData", async (req, res) => {
     // console.log(clientData);
   }
  // Sort the clientData array based on the selected sorting parameter
- if (sortOptions[sortParam]) {
-  clientData.sort((a, b) => {
-    if (sortParam.startsWith('-')) {
-      return b[sortOptions[sortParam].substring(1)] - a[sortOptions[sortParam].substring(1)];
-    } else {
-      return a[sortOptions[sortParam]] - b[sortOptions[sortParam]];
-    }
-  });
+//  if (sortOptions[sortParam]) {
+//   clientData.sort((a, b) => {
+//     if (sortParam.startsWith('-')) {
+//       return b[sortOptions[sortParam].substring(1)] - a[sortOptions[sortParam].substring(1)];
+//     } else {
+//       return a[sortOptions[sortParam]] - b[sortOptions[sortParam]];
+//     }
+//   });
+// }
+// Sort the clientData array based on the selected sorting parameter
+if (sortOptions[sortParam]) {
+  if (sortParam.startsWith('-')) {
+    clientData.sort((a, b) =>
+      b[sortOptions[sortParam].substring(1)].localeCompare(a[sortOptions[sortParam].substring(1)], undefined, { sensitivity: 'base' })
+    );
+  } else {
+    clientData.sort((a, b) =>
+      a[sortOptions[sortParam]].localeCompare(b[sortOptions[sortParam]], undefined, { sensitivity: 'base' })
+    );
+  }
 }
   // console.log(clientData);
   res.render("clientData", { clientData, allUsers });
