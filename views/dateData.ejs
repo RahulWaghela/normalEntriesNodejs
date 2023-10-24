@@ -45,16 +45,29 @@
                             </th>
                             <th>BSNL Data
                             </th>
+                            <th>Total Data
+                            </th>
                         </tr>
                     </thead>
                 </thead>
                 <tbody>
-                    <% Object.keys(dateWiseData).forEach(date => { %>
+                    <!-- <% Object.keys(dateWiseData).forEach(date => { %>
                         <tr>
                           <td><%= date %></td>
                           <td><%= dateWiseData[date]['A_airtel'] || 0 %></td>
                           <td><%= dateWiseData[date]['M_airtel'] || 0 %></td>
                           <td><%= dateWiseData[date]['BSNL'] || 0 %></td>
+                          <td><%= dateWiseData[date]['TotalData'] %></td>
+                        </tr>
+                      <% }); %> -->
+                      <% dateWiseData.forEach(entry => { %>
+                        <tr>
+                          <td><%= entry.date %></td>
+                          <td><%= entry['A_airtel'] || 0 %></td>
+                          <td><%= entry['M_airtel'] || 0 %></td>
+                          <td><%= entry['BSNL'] || 0 %></td>
+                          <!-- <td><%= (entry['A_airtel'] || 0) + (entry['M_airtel'] || 0) + (entry['BSNL'] || 0) %></td> -->
+                          <td><%= entry['TotalData'] || 0 %></td>
                         </tr>
                       <% }); %>
                 </tbody>

@@ -35,6 +35,7 @@ app.get('/', async (req, res) => {
 
     const allUsers = await allDetailsofUser
       .find()
+      .sort({ createdAt: -1 })  // Sort by createdAt in descending order
       .skip(skip)
       .limit(ITEMS_PER_PAGE);
 
@@ -97,7 +98,7 @@ app.get('/Queuereport', async (req, res) => {
 
     // Query the database to get records that match the date range
     // const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1, clientSelect : sortOrder  });
-    const allUsersInDB = await FormData.find(dateFilter);
+    const allUsersInDB = await FormData.find(dateFilter).sort({ createdAt: -1 });;
     // console.log(allUsersInDB);
     // Calculate the total count of filtered records
     // const totalCount = allUsersInDB.length;
@@ -172,10 +173,10 @@ app.get('/sentReport', async (req, res) => {
 
 
     const lastAirtel_A_100 = airtel_A_100[airtel_A_100.length - 1];
-    const lastAirtel_M_100 = airtel_A_100[airtel_M_100.length - 1];
+    const lastAirtel_M_100 = airtel_M_100[airtel_M_100.length - 1];
     // console.log('Last Airtel_A*100:', lastAirtel_A_100);
 
-    const lastBSNL_100 = airtel_A_100[BSNL_100.length - 1];
+    const lastBSNL_100 = BSNL_100[BSNL_100.length - 1];
 
 
 
@@ -393,7 +394,7 @@ app.get('/simData', async (req, res) => {
 
     // Fetch all Telecom documents from the database sorted by createdAt
     // const telecomData = await Telecom.find().sort({ createdAt: -1 }).exec();
-    const telecomData = await Telecom.find({});
+    const telecomData = await Telecom.find({}).sort({ createdAt: -1 });
     if (req.query.sort === 'airtel_A' || req.query.sort === '-airtel_A') {
       telecomData.sort((a, b) => {
         const dataA = a.airtel_A;
@@ -602,7 +603,7 @@ app.get("/clientData", async (req, res) => {
 
   // const clientData = await FormData.find({},'clientSelect sent selectbox');
   const allUsers = await allDetailsofUser.find({}, 'name');
- 
+
   //  console.log(allUsers);
   //  console.log(clientData);
   // Create an array to store the calculated total data for each client
@@ -655,30 +656,30 @@ app.get("/clientData", async (req, res) => {
     });
     // console.log(clientData);
   }
- // Sort the clientData array based on the selected sorting parameter
-//  if (sortOptions[sortParam]) {
-//   clientData.sort((a, b) => {
-//     if (sortParam.startsWith('-')) {
-//       return b[sortOptions[sortParam].substring(1)] - a[sortOptions[sortParam].substring(1)];
-//     } else {
-//       return a[sortOptions[sortParam]] - b[sortOptions[sortParam]];
-//     }
-//   });
-// }
-// Sort the clientData array based on the selected sorting parameter
-// if (sortOptions[sortParam]) {
-//   if (sortParam.startsWith('-')) {
-//     clientData.sort((a, b) =>
-//       b[sortOptions[sortParam].substring(1)].localeCompare(a[sortOptions[sortParam].substring(1)], undefined, { sensitivity: 'base' })
-//     );
-//   } else {
-//     clientData.sort((a, b) =>
-//       a[sortOptions[sortParam]].localeCompare(b[sortOptions[sortParam]], undefined, { sensitivity: 'base' })
-//     );
-//   }
-// }
+  // Sort the clientData array based on the selected sorting parameter
+  //  if (sortOptions[sortParam]) {
+  //   clientData.sort((a, b) => {
+  //     if (sortParam.startsWith('-')) {
+  //       return b[sortOptions[sortParam].substring(1)] - a[sortOptions[sortParam].substring(1)];
+  //     } else {
+  //       return a[sortOptions[sortParam]] - b[sortOptions[sortParam]];
+  //     }
+  //   });
+  // }
+  // Sort the clientData array based on the selected sorting parameter
+  // if (sortOptions[sortParam]) {
+  //   if (sortParam.startsWith('-')) {
+  //     clientData.sort((a, b) =>
+  //       b[sortOptions[sortParam].substring(1)].localeCompare(a[sortOptions[sortParam].substring(1)], undefined, { sensitivity: 'base' })
+  //     );
+  //   } else {
+  //     clientData.sort((a, b) =>
+  //       a[sortOptions[sortParam]].localeCompare(b[sortOptions[sortParam]], undefined, { sensitivity: 'base' })
+  //     );
+  //   }
+  // }
 
-   // Sort the clientData array based on the selected sorting parameter
+  // Sort the clientData array based on the selected sorting parameter
   if (sortParam === 'username') {
     clientData.sort((a, b) => a.client.localeCompare(b.client, undefined, { sensitivity: 'base' }));
   } else if (sortParam === '-username') {
@@ -703,9 +704,9 @@ app.get("/clientData", async (req, res) => {
 
 // total of all operator
 
-app.get("/dateData",async(req,res)=>{
+app.get("/dateData", async (req, res) => {
 
- try {
+  try {
     const data = await FormData.find({}, 'createdAt selectbox sent');
 
     // Calculate date-wise total data
@@ -717,17 +718,28 @@ app.get("/dateData",async(req,res)=>{
       if (!acc[date]) {
         acc[date] = { date };
       }
-      
+      // if (!acc[date]) {
+      //   acc[date] = { date: new Date(date), formattedDate: date }; // Store both date formats
+      // }
+
+
       if (!acc[date][selectbox]) {
         acc[date][selectbox] = 0;
       }
 
       acc[date][selectbox] += sent;
-
+      // Calculate the Total Data for each date
+      acc[date].TotalData = (acc[date]['A_airtel'] || 0) + (acc[date]['M_airtel'] || 0) + (acc[date]['BSNL'] || 0);
       return acc;
     }, {});
 
-    res.render('dateData', { dateWiseData });
+    // Convert dateWiseData into an array and sort it by date in descending order (newest first)
+    // const sortedDateWiseData = Object.values(dateWiseData).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Convert dateWiseData into an array and sort it by date in descending order (newest first)
+    const sortedDateWiseData = Object.values(dateWiseData)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    res.render('dateData', { dateWiseData: sortedDateWiseData });
   } catch (error) {
     console.error(error);
   }
