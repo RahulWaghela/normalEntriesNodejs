@@ -45,8 +45,8 @@
         <thead>
           <tr>
             <th scope="col">Name
-              <a href="/clients?sort=username" class="sort-link" id="change">&#9650;</a>
-              <a href="/clients?sort=-username" id="change" class="sort-link">&#9660;</a>
+              <a href="/?sort=username" class="sort-link" id="change">&#9650;</a>
+              <a href="/?sort=-username" id="change" class="sort-link">&#9660;</a>
             </th>
             <th scope="col">Phone Number</th>
             <th scope="col">Email</th>
@@ -77,11 +77,11 @@
 
       <div class="pagination">
         <% if (currentPage> 1) { %>
-        <a href="/clients?page=<%= currentPage - 1 %>" class="paginationBtn">Previous</a>
+        <a href="/?page=<%= currentPage - 1 %>" class="paginationBtn">Previous</a>
         <% } %>
 
         <% if (allUsers.length===ITEMS_PER_PAGE) { %>
-        <a href="/clients?page=<%= currentPage + 1 %>" class="paginationBtn">Next</a>
+        <a href="/?page=<%= currentPage + 1 %>" class="paginationBtn">Next</a>
         <% } %>
       </div>
       <div class="modal fade" id="myModal">
