@@ -10,19 +10,19 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.render('addClient');
-})
+// app.get('/', (req, res) => {
+//   res.render('clients');
+// })
 
-app.get('/addClients', (req, res) => {
-  res.render('addClient');
-})
+// app.get('/addClients', (req, res) => {
+//   res.render('addClient');
+// })
 
 
 // client get Request Starts
 const ITEMS_PER_PAGE = 10; // Number of records to display per page
 
-app.get('/clients', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     let sortOrder = 1;
 
@@ -312,7 +312,7 @@ app.post('/sendInDatabase', async (req, res) => {
 
     await saveAllRecordInDB.save();
     console.log(name);
-    res.redirect('/clients');
+    res.redirect('/');
   } catch (error) {
     console.error('failed to send', error);
     res.status(500).send('can not send to the server...');
@@ -703,7 +703,35 @@ app.get("/clientData", async (req, res) => {
 
 // total of all operator
 
+app.get("/dateData",async(req,res)=>{
 
+ try {
+    const data = await FormData.find({}, 'createdAt selectbox sent');
+
+    // Calculate date-wise total data
+    const dateWiseData = data.reduce((acc, entry) => {
+      const date = entry.createdAt.toISOString().slice(0, 10); // Extract the date part
+      const selectbox = entry.selectbox; // Airtel A, Airtel M, BSNL, etc.
+      const sent = entry.sent;
+
+      if (!acc[date]) {
+        acc[date] = { date };
+      }
+      
+      if (!acc[date][selectbox]) {
+        acc[date][selectbox] = 0;
+      }
+
+      acc[date][selectbox] += sent;
+
+      return acc;
+    }, {});
+
+    res.render('dateData', { dateWiseData });
+  } catch (error) {
+    console.error(error);
+  }
+})
 app.listen(port, () => {
   console.log(`Server Running at http://localhost:${port}`);
 })
