@@ -79,7 +79,7 @@
                     <th>Operator</th>
                     <th>Sim</th>
                     <th>Data </th>
-                    <th>Last Update</th>
+                   
                 </tr>
             </thead>
             <tbody>
@@ -148,7 +148,7 @@
                 <td>
                   <%= data.BSNL.toLocaleString() %>
                 </td>
-                <td>
+                <td class="dateElement">
                   <%= data.createdAt.toLocaleString() %>
                 </td>
               </tr>
@@ -165,7 +165,38 @@
           <% } %>
       </div>
 
-
+      <script>
+        // Select all elements with the "dateElement" class
+        const dateElements = document.querySelectorAll('.dateElement');
+      
+        // Function to format the date from "yyyy-mm-dd" to "dd/mm/yyyy"
+        function formatDate(inputDate) {
+          const dateParts = inputDate.split(','); // Split date and time
+          const date = dateParts[0].trim(); // Extract the date part
+          const time = dateParts[1].trim(); // Extract the time part
+      
+          const dateObj = new Date(date); // Convert to JavaScript Date object
+          if (isNaN(dateObj)) {
+            return inputDate; // If the date is not valid, return it as is
+          }
+      
+          const day = dateObj.getDate().toString().padStart(2, '0'); // Get day with leading zeros
+          const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // Get month with leading zeros
+          const year = dateObj.getFullYear();
+      
+          const formattedDate = `${day}/${month}/${year}`; // Format as dd/mm/yyyy
+          const formattedDateTime = `${formattedDate}, ${time}`; // Add the time back
+      
+          return formattedDateTime;
+        }
+      
+        // Iterate through all date elements and update their content
+        dateElements.forEach(dateElement => {
+          const originalDate = dateElement.textContent;
+          const formattedDate = formatDate(originalDate);
+          dateElement.textContent = formattedDate;
+        });
+      </script>
       <script>
 
   // Find all the table rows in the tbody
@@ -233,15 +264,15 @@
               // Update the table cells with the values
               document.getElementById("airtelAOriginal").textContent = lastAirtelA !== null ? lastAirtelA : "";
               document.getElementById("airtelA100").textContent = lastAirtelA !== null ? lastAirtelA * 100 : "";
-              document.getElementById("airtelATime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
+              // document.getElementById("airtelATime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
 
               document.getElementById("airtelMOriginal").textContent = lastAirtelM !== null ? lastAirtelM : "";
               document.getElementById("airtelM100").textContent = lastAirtelM !== null ? lastAirtelM * 100 : "";
-              document.getElementById("airtelMTime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
+              // document.getElementById("airtelMTime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
 
               document.getElementById("bsnlOriginal").textContent = lastBSNL !== null ? lastBSNL : "";
               document.getElementById("bsnl100").textContent = lastBSNL !== null ? lastBSNL * 100 : "";
-              document.getElementById("bsnlTime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
+              // document.getElementById("bsnlTime").textContent = lastUpdateTime !== null ? lastUpdateTime.toLocaleString() : "";
           }
 
           // Add an event listener to run the function when the document is ready

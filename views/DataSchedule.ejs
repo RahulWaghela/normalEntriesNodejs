@@ -88,7 +88,7 @@
                 <td><%= data.client %></td>
                 <td><%= data.operator %></td>
                 <td><%= (data.data).toLocaleString() %></td>
-                <td><%= data.date %></td>
+                <td class="dateElement"><%= data.date %></td>
               </tr>
             <% }); %>
           </tbody>
@@ -98,7 +98,38 @@
 
 
 </div>
+<script>
+  // Select all elements with the "dateElement" class
+const dateElements = document.querySelectorAll('.dateElement');
+  console.log("shree");
+  console.log(dateElements);
+// Function to format the date from "yyyy-mm-dd" to "dd/mm/yyyy"
+function formatDate(inputDate) {
+    console.log("radhe")
+  const parts = inputDate.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
 
+    // Ensure month and day have leading zeros if necessary
+    const formattedMonth = month.padStart(2, '0');
+    const formattedDay = day.padStart(2, '0');
+
+    return `${formattedDay}/${formattedMonth}/${year}`;
+  } else {
+    // If the input date is not in the expected format, return it as is
+    return inputDate;
+  }
+}
+
+// Iterate through all date elements and update their content
+dateElements.forEach(dateElement => {
+  const originalDate = dateElement.textContent;
+  const formattedDate = formatDate(originalDate);
+  dateElement.textContent = formattedDate;
+});
+</script>
 
   </script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
