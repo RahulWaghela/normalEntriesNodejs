@@ -404,9 +404,13 @@ app.get('/simData', async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Get the requested page number from query params
     const skip = (page - 1) * ITEMS_PER_PAGEs;
 
-    // Fetch all Telecom documents from the database sorted by createdAt
-    // const telecomData = await Telecom.find().sort({ createdAt: -1 }).exec();
-    const telecomData = await Telecom.find({}).sort({ createdAt: -1 });
+    
+    // Fetch the latest Telecom document from the database sorted by createdAt
+    const latestTelecomData = await Telecom.findOne().sort({ createdAt: -1 }).exec();
+
+    // Create an array with the latest entry
+    const telecomData = latestTelecomData ? [latestTelecomData] : [];
+
     if (req.query.sort === 'airtel_A' || req.query.sort === '-airtel_A') {
       telecomData.sort((a, b) => {
         const dataA = a.airtel_A;
@@ -460,6 +464,7 @@ app.get('/simData', async (req, res) => {
     res.status(500).send('Error fetching data.');
   }
 });
+
 // simdata post and get request Ends
 
 
