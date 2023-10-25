@@ -110,11 +110,12 @@
                 : 0 %>
               </td>
               <td>
-                <%= subtractedVAl1 !==undefined ? subtractedVAl1.toLocaleString()
-                : 0 %>
+                <%= isNaN(subtractedVAl1) ? 0 : subtractedVAl1.toLocaleString()
+                %>
               </td>
               <td>
-                <%= lastAirtel_A_100 !==undefined ? lastAirtel_A_100.toLocaleString()
+                <%= lastAirtel_A_100 !==undefined ?
+                lastAirtel_A_100.toLocaleString()
                 : 0 %>
               </td>
 
@@ -127,15 +128,15 @@
                 : 0 %>
               </td>
               <td>
-                <%= subtractedVAl2 !==undefined ? subtractedVAl2.toLocaleString()
-                : 0 %>
+                <%= isNaN(subtractedVAl2) ? 0 : subtractedVAl2.toLocaleString()
+                %>
               </td>
               <td>
-                <%= lastAirtel_M_100 !==undefined ? lastAirtel_M_100.toLocaleString()
+                <%= lastAirtel_M_100 !==undefined ?
+                lastAirtel_M_100.toLocaleString()
                 : 0 %>
               </td>
 
-              
             </tr>
             <tr>
               <td>Bsnl</td>
@@ -144,14 +145,14 @@
                 : 0 %>
               </td>
               <td>
-                <%= subtractedVAl3 !==undefined ? subtractedVAl3.toLocaleString()
-                : 0 %>
+                <%= isNaN(subtractedVAl3) ? 0 : subtractedVAl3.toLocaleString()
+                %>
               </td>
               <td>
                 <%= lastBSNL_100 !==undefined ? lastBSNL_100.toLocaleString()
                 : 0 %>
               </td>
-              
+
             </tr>
             <tr>
               <td>Total of All</td>
@@ -160,14 +161,14 @@
                 : 0 %>
               </td>
               <td>
-                <%= total !==undefined ? total.toLocaleString()
-                : 0 %>
+                <%= isNaN(total) ? 0 : total.toLocaleString()
+                %>
               </td>
               <td>
-                <%= lastTotal !==undefined ? lastTotal.toLocaleString()
-                : 0 %>
+                <%= isNaN(lastTotal) ? 0 : lastTotal.toLocaleString()
+                %>
               </td>
-              
+
             </tr>
 
             <!-- <tr>
