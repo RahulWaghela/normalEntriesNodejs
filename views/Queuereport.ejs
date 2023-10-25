@@ -96,7 +96,7 @@
               <%= user.selectbox %>
             </td>
 
-            <td>
+            <td class="dateElement">
               <%= new Date(user.createdAt).toLocaleString() %>
             </td>
           </tr>
@@ -113,7 +113,39 @@
       </div>
 
     </div>
-
+    <script>
+      // Select all elements with the "dateElement" class
+      const dateElements = document.querySelectorAll('.dateElement');
+    
+      // Function to format the date from "yyyy-mm-dd" to "dd/mm/yyyy"
+      function formatDate(inputDate) {
+        const dateParts = inputDate.split(','); // Split date and time
+        const date = dateParts[0].trim(); // Extract the date part
+        const time = dateParts[1].trim(); // Extract the time part
+    
+        const dateObj = new Date(date); // Convert to JavaScript Date object
+        if (isNaN(dateObj)) {
+          return inputDate; // If the date is not valid, return it as is
+        }
+    
+        const day = dateObj.getDate().toString().padStart(2, '0'); // Get day with leading zeros
+        const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // Get month with leading zeros
+        const year = dateObj.getFullYear();
+    
+        const formattedDate = `${day}/${month}/${year}`; // Format as dd/mm/yyyy
+        const formattedDateTime = `${formattedDate}, ${time}`; // Add the time back
+    
+        return formattedDateTime;
+      }
+    
+      // Iterate through all date elements and update their content
+      dateElements.forEach(dateElement => {
+        const originalDate = dateElement.textContent;
+        const formattedDate = formatDate(originalDate);
+        dateElement.textContent = formattedDate;
+      });
+    </script>
+    
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
       crossorigin="anonymous"></script>

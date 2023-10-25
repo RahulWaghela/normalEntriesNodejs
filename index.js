@@ -707,6 +707,7 @@ app.get("/clientData", async (req, res) => {
 app.get("/dateData", async (req, res) => {
 
   try {
+    const getSimData = await Telecom.find({}, 'createdAt airtel_A airtel_M BSNL');
     const data = await FormData.find({}, 'createdAt selectbox sent');
 
     // Calculate date-wise total data
@@ -732,14 +733,35 @@ app.get("/dateData", async (req, res) => {
       acc[date].TotalData = (acc[date]['A_airtel'] || 0) + (acc[date]['M_airtel'] || 0) + (acc[date]['BSNL'] || 0);
       return acc;
     }, {});
+    // Calculate date-wise total data for Telecom
+    const telecomData = getSimData.reduce((acc, entry) => {
+      // console.log("shree radhe")
+      const date = entry.createdAt.toISOString().slice(0, 10);
+      if (!acc[date]) {
+        acc[date] = {
+          totalAirtel_A: 0,
+          totalAirtel_M: 0,
+          totalBSNL: 0
+        };
+      }
+      acc[date].totalAirtel_A += entry.airtel_A || 0;
+      acc[date].totalAirtel_M += entry.airtel_M || 0;
+      acc[date].totalBSNL += entry.BSNL || 0;
+      return acc;
+    }, {});
+    // console.log(telecomData);
+    // Calculate date-wise total data for Telecom
+    //  const telecomData = getSimData.reduce((acc, entry) => {
+    //   const date = entry.createdAt.toISOString().slice(0, 10); 
+    //   acc[date] = entry; 
+    //   return acc;
+    // }, {});
 
-    // Convert dateWiseData into an array and sort it by date in descending order (newest first)
-    // const sortedDateWiseData = Object.values(dateWiseData).sort((a, b) => new Date(b.date) - new Date(a.date));
 
     // Convert dateWiseData into an array and sort it by date in descending order (newest first)
     const sortedDateWiseData = Object.values(dateWiseData)
       .sort((a, b) => new Date(b.date) - new Date(a.date));
-    res.render('dateData', { dateWiseData: sortedDateWiseData });
+    res.render('dateData', { dateWiseData: sortedDateWiseData, telecomData });
   } catch (error) {
     console.error(error);
   }
