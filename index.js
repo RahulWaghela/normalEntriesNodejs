@@ -168,8 +168,11 @@ app.get('/sentReport', async (req, res) => {
 
     const getSimData = await Telecom.find();
     const airtel_A_100 = getSimData.map(entry => entry.airtel_A * 100);
+    // console.log("1st : ",airtel_A_100);
     const airtel_M_100 = getSimData.map(entry => entry.airtel_M * 100);
+    // console.log("2st : ",airtel_M_100);
     const BSNL_100 = getSimData.map(entry => entry.BSNL * 100);
+    // console.log("3st : ",BSNL_100);
 
 
     const lastAirtel_A_100 = airtel_A_100[airtel_A_100.length - 1];
@@ -260,11 +263,11 @@ app.get('/sentReport', async (req, res) => {
     });
     const TotalOfALl = totalAirtel_A + totalAirtel_M + totalBSNL;
     // Console log totals
-    console.log('Total A_airtel:', totalAirtel_A);
+    // console.log('Total A_airtel:', totalAirtel_A);
     // console.log('Total M_airtel:', totalAirtel_M);
     // console.log('Total BSNL:', totalBSNL);
 
-    const subtractedVAl1 = totalAirtel_A - lastAirtel_A_100;
+    const subtractedVAl1 =  totalAirtel_A - lastAirtel_A_100;
     const subtractedVAl2 = totalAirtel_M - lastAirtel_M_100;
     const subtractedVAl3 = totalBSNL - lastBSNL_100;
     const total = subtractedVAl1 + subtractedVAl2 + subtractedVAl3;
@@ -279,7 +282,16 @@ app.get('/sentReport', async (req, res) => {
       });
       return filledEntry;
     });
-
+    // console.log("x''",totalAirtel_A);
+    // console.log("y''",totalAirtel_M);
+    // console.log("z''",totalBSNL);
+    // console.log("x'",subtractedVAl1);
+    // console.log("y'",subtractedVAl2);
+    // console.log("z'",subtractedVAl3);
+   
+    // console.log("x : " , lastAirtel_A_100);
+    // console.log("y : " , lastAirtel_M_100);
+    // console.log("z : " , lastBSNL_100);
     // Render a new view with the total values
     res.render('sentreport', { latestEntries: processedEntries, selectedDate, lastTotal, lastAirtel_A_100, lastAirtel_M_100, lastBSNL_100, total, subtractedVAl1, subtractedVAl2, subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator, TotalOfALl });
   } catch (error) {
