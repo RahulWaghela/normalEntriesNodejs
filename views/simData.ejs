@@ -212,9 +212,14 @@
   tableRows.forEach((row) => {
     const cells = row.querySelectorAll("td");
     if (cells.length >= 5) {
-      const airtelA = parseInt(cells[1].textContent, 10);
-      const airtelM = parseInt(cells[2].textContent, 10);
-      const bsnl = parseInt(cells[3].textContent, 10);
+      
+      const airtelA = parseInt(cells[1].textContent.replace(/,/g, ''), 10);
+
+      // console.log( "airtel a : ",airtelA);
+      const airtelM = parseInt(cells[2].textContent.replace(/,/g, ''), 10);
+      // console.log( "airtel m : ",airtelM);
+      const bsnl = parseInt(cells[3].textContent.replace(/,/g, ''), 10);
+      // console.log( "bsnl : ",bsnl);
       const updateTime = new Date(cells[4].textContent);
 
       // Check if the current row has valid data
@@ -229,7 +234,6 @@
       }
     }
   });
-
   // Log the values in the console
   console.log("Last airtel_A (Original):", lastAirtelA);
   console.log("Last airtel_A (*100):", lastAirtelA !== null ? lastAirtelA * 100 : null);

@@ -48,46 +48,34 @@
                             </th>
                             <th>BSNL Data
                             </th>
-                            <th>Total Data
-                            </th>
-                            <th>Total SIM Data
-                            </th>
+                           <th>Total Data</th>
+                           <th>Total SIM Data</th>
                         </tr>
                     </thead>
                 </thead>
                 <tbody>
-                    <!-- <% Object.keys(dateWiseData).forEach(date => { %>
-                        <tr>
-                          <td><%= date %></td>
-                          <td><%= dateWiseData[date]['A_airtel'] || 0 %></td>
-                          <td><%= dateWiseData[date]['M_airtel'] || 0 %></td>
-                          <td><%= dateWiseData[date]['BSNL'] || 0 %></td>
-                          <td><%= dateWiseData[date]['TotalData'] %></td>
-                        </tr>
-                      <% }); %> -->
-                    <% dateWiseData.forEach(entry => { %>
+                  <% Object.keys(airtelASum).forEach(date => { %>
                     <tr>
-                        <td class="dateElement"><%= entry.date %></td>
-                        <td><%= entry['A_airtel'] || 0 %></td>
-                        <td><%= entry['M_airtel'] || 0 %></td>
-                        <td><%= entry['BSNL'] || 0 %></td>
-                        <!-- <td><%= (entry['A_airtel'] || 0) + (entry['M_airtel'] || 0) + (entry['BSNL'] || 0) %></td> -->
-                        <td><%= entry['TotalData'] || 0 %></td>
-                        <td>
-                            <% const telecomEntry = telecomData[entry.date] ||
-                            {};
-                            %>
-                           
-                            <%= (telecomEntry.totalAirtel_A || 0) + (telecomEntry.totalAirtel_M || 0) + (telecomEntry.totalBSNL || 0) === 0 ? 0 : ((telecomEntry.totalAirtel_A || 0) + (telecomEntry.totalAirtel_M || 0) + (telecomEntry.totalBSNL || 0)) * 100 %>
-                        </td>
+                      <td><%= date %></td>
+                      <td><%= airtelASum[date] %></td>
+                      <td><%= airtelMSum[date] %></td>
+                      <td><%= bsnlSum[date] %></td>
+                      <td><%= airtelASum[date] + airtelMSum[date] + bsnlSum[date]  %></td>
+                  
+                      <td>
+                        <% latestTelecomData.forEach(telecom => { %>
+                          <% if (telecom.date === date) { %>
+                            <%= telecom.total %>
+                          <% } %>
+                        <% }); %>
+                      </td>
                     </tr>
-                    <% }); %>
-
+                  <% }); %>
                 </tbody>
             </table>
 
         </div>
-<script>
+        <script>
   // Select all elements with the "dateElement" class
 const dateElements = document.querySelectorAll('.dateElement');
   console.log("shree");
