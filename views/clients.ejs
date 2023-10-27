@@ -28,6 +28,33 @@
       color: white;
       text-decoration: none;
     }
+
+    /* Add your modal styles here */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      width: 50%;
+      margin: 100px auto;
+    }
+
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 10px;
+      cursor: pointer;
+    }
   </style>
   </head>
 
@@ -51,6 +78,7 @@
             <th scope="col">Phone Number</th>
             <th scope="col">Email</th>
             <th scope="col">Date and Time</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -66,16 +94,13 @@
               <%= allUsers[i].email %>
             </td>
             <td class="dateElement">
-              <%= allUsers[i].createdAt.toLocaleString('en-US', { 
-                day: 'numeric',
-                 month: 'numeric',
-                  year: 'numeric' ,
-                  hour: 'numeric' , 
-                  minute: 'numeric' ,
-                   second: 'numeric',
-                   }) %>
+              <%= allUsers[i].createdAt.toLocaleString('en-US', { day: 'numeric'
+              , month: 'numeric' , year: 'numeric'
+              , hour: 'numeric' , minute: 'numeric' , second: 'numeric' , }) %>
             </td>
-            
+            <td><a href="/editRole?userId=<%= allUsers[i]._id %>"
+                class="edit-icon">
+                edit </a></td>
           </tr>
           <% } %>
         </tbody>
@@ -90,6 +115,139 @@
         <a href="/?page=<%= currentPage + 1 %>" class="paginationBtn">Next</a>
         <% } %>
       </div>
+
+      <div id="editModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+
+          <h2>Edit User Name and Mobile</h2>
+          <form id="roleEditForm">
+
+            <label for="newRole">Edit Name :</label>
+            <input type="text" id="newName" name="newName" required>
+            <label for="newRole">Edit Mobile :</label>
+            <input type="text" id="newMobile" name="newMobile" required>
+
+            <button style=" color :white; background-color :black;"
+              class="btn btn-success" type="submit">Save</button>
+            <button style=" color :white; background-color :black;" class="btn "
+              type="button"
+              id="cancelButton">Cancel</button>
+
+          </form>
+        </div>
+      </div>
+
+ <script>
+      // Handle edit icon click for editing individual user name and mobile
+      var editIcons = document.querySelectorAll('.edit-icon');
+      var modal = document.getElementById('editModal');
+      var roleEditForm = document.getElementById('roleEditForm');
+      var newNameInput = document.getElementById('newName');
+      var newMobileInput = document.getElementById('newMobile');
+  
+      editIcons.forEach(function (editIcon) {
+          editIcon.addEventListener('click', function (event) {
+              event.preventDefault();
+              var userId = this.getAttribute('href').split('=')[1];
+              console.log(userId);
+              // Show the modal
+              modal.style.display = 'block';
+  
+              // Fetch the current user role via AJAX
+              var xhr = new XMLHttpRequest();
+              xhr.open('GET', `/getUserRole/${userId}`, true);
+              xhr.onreadystatechange = function () {
+                  if (xhr.readyState === 4 && xhr.status === 200) {
+                      var data = JSON.parse(xhr.responseText);
+                      var currentName = data.name;
+                      var currentMobile = data.phone;
+                      newNameInput.value = currentName;
+                      newMobileInput.value = currentMobile;
+                  } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                      console.error('Error fetching user name and mobile', xhr.status, xhr.statusText);
+                  }
+              };
+              xhr.send(null);
+  
+              // Handle the form submission
+              roleEditForm.addEventListener('submit', function (e) {
+  
+                  e.preventDefault();
+                  var newname = newNameInput.value;
+                  console.log(newname);
+                  var newmobile = newMobileInput.value;
+                  console.log(newmobile);
+                  // Send an AJAX request to update the user's role
+                  var xhr2 = new XMLHttpRequest();
+  
+                  xhr2.open('POST', `/updateRole/${userId}`, true);
+                  console.log('User role updated successfully');
+                  xhr2.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+                  xhr2.onreadystatechange = function () {
+                      if (xhr2.readyState === 4 && xhr2.status === 200) {
+                          modal.style.display = 'none';
+                          location.reload(); // Reload the page
+                          var editIconSelector = `.edit-icon[href="/editRole?userId=${userId}"]`;
+                          var editIcon = document.querySelector(editIconSelector);
+  
+                          if (editIcon) {
+                              var row = editIcon.closest('tr');
+  
+                              if (row) {
+                                  var nameCell = row.querySelector('td:nth-child(1)');
+                                  var mobileCell = row.querySelector('td:nth-child(2)');
+  
+                                  if (nameCell && mobileCell) {
+                                      nameCell.textContent = newname;
+                                      mobileCell.textContent = newmobile;
+                                  } else {
+                                      console.error('Name and/or mobile cell not found');
+                                  }
+                              } else {
+                                  console.error(`Row not found for userID: ${userId}`);
+                              }
+                          } else {
+                              console.error(`Edit icon not found for userID: ${userId}`);
+                          }
+  
+  
+  
+  
+                      } else if (xhr2.readyState === 4 && xhr2.status !== 200) {
+                          // Handle error response
+                          console.error('Error updating user role', xhr2.status, xhr2.statusText);
+                      }
+                  };
+  
+                  xhr2.send(JSON.stringify({ newname: newname, newmobile: newmobile }));
+                  console.log("update successfully!")
+              });
+          });
+      });
+  
+      // Handle modal close when "Cancel" button is clicked
+      var cancelButton = document.getElementById('cancelButton');
+      cancelButton.addEventListener('click', function () {
+          modal.style.display = 'none';
+          location.reload(); // Reload the page
+      });
+  
+      // Handle modal close when clicking outside the modal
+      window.onclick = function (event) {
+          if (event.target === modal) {
+              modal.style.display = 'none';
+              location.reload(); // Reload the page
+          }
+      };
+
+</script>
+
+
+
+
+
+
       <div class="modal fade" id="myModal">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -143,28 +301,28 @@
     <script>
       // Select all elements with the "dateElement" class
       const dateElements = document.querySelectorAll('.dateElement');
-    
+
       // Function to format the date from "yyyy-mm-dd" to "dd/mm/yyyy"
       function formatDate(inputDate) {
         const dateParts = inputDate.split(','); // Split date and time
         const date = dateParts[0].trim(); // Extract the date part
         const time = dateParts[1].trim(); // Extract the time part
-    
+
         const dateObj = new Date(date); // Convert to JavaScript Date object
         if (isNaN(dateObj)) {
           return inputDate; // If the date is not valid, return it as is
         }
-    
+
         const day = dateObj.getDate().toString().padStart(2, '0'); // Get day with leading zeros
         const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // Get month with leading zeros
         const year = dateObj.getFullYear();
-    
+
         const formattedDate = `${day}/${month}/${year}`; // Format as dd/mm/yyyy
         const formattedDateTime = `${formattedDate}, ${time}`; // Add the time back
-    
+
         return formattedDateTime;
       }
-    
+
       // Iterate through all date elements and update their content
       dateElements.forEach(dateElement => {
         const originalDate = dateElement.textContent;
@@ -172,11 +330,7 @@
         dateElement.textContent = formattedDate;
       });
     </script>
-    
-    
-    
-    
-   
+
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
       crossorigin="anonymous"></script>
