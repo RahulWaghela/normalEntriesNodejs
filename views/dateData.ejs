@@ -54,27 +54,23 @@
                     </thead>
                 </thead>
                 <tbody>
-                    <% dateWiseData.forEach(entry => { %>
-                        <tr>
-                            <td class="dateElement"><%= entry.date %></td>
-                            <td><%= entry['A_airtel'] || 0 %></td>
-                            <td><%= entry['M_airtel'] || 0 %></td>
-                            <td><%= entry['BSNL'] || 0 %></td>
-                           
-                            <td><%= entry['TotalData'] || 0 %></td>
-                            
-                            <td>
-                                <% let telecomTotal = 0; %>
-                                <% latestTelecomData.forEach(telecom => { %>
-                                  <% if (telecom.date === entry.date) { %>
-                                    <% telecomTotal = telecom.total; %>
-                                  <% } %>
-                                <% }); %>
-                                <%= telecomTotal %>
-                              </td>
-                              
-                        </tr>
+                  <% Object.keys(airtelASum).forEach(date => { %>
+                    <tr>
+                      <td><%= date %></td>
+                      <td><%= airtelASum[date] %></td>
+                      <td><%= airtelMSum[date] %></td>
+                      <td><%= bsnlSum[date] %></td>
+                      <td><%= airtelASum[date] + airtelMSum[date] + bsnlSum[date]  %></td>
+                  
+                      <td>
+                        <% latestTelecomData.forEach(telecom => { %>
+                          <% if (telecom.date === date) { %>
+                            <%= telecom.total %>
+                          <% } %>
                         <% }); %>
+                      </td>
+                    </tr>
+                  <% }); %>
                 </tbody>
             </table>
 

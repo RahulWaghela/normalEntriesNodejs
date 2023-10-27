@@ -858,28 +858,112 @@ app.get("/clientData", async (req, res) => {
 app.get("/dateData", async (req, res) => {
 
   try {
-   
-    const data = await FormData.find({}, 'createdAt selectbox sent');
 
-    // Calculate date-wise total data
-    const dateWiseData = data.reduce((acc, entry) => {
-      const date = entry.createdAt.toISOString().slice(0, 10); // Extract the date part
-      const selectbox = entry.selectbox; // Airtel A, Airtel M, BSNL, etc.
-      const sent = entry.sent;
+    // let pipeline = [
+    //   {
+    //     $group: {
+    //       _id: {
+    //         clientSelect: '$clientSelect',
+    //         selectbox: '$selectbox',
+    //       },
+    //       latestEntry: { $last: '$$ROOT' },
+    //     },
+    //   },
+    //   {
+    //     $replaceRoot: { newRoot: '$latestEntry' },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: '$clientSelect',
+    //       latestEntries: { $push: { selectbox: '$selectbox', sent: '$sent', lastUpdate: '$lastUpdate' } },
+    //     },
+    //   },
+    // ];
 
-      if (!acc[date]) {
-        acc[date] = { date };
+    const datePipeline = [
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            clientSelect: '$clientSelect',
+            selectbox: '$selectbox',
+          },
+          latestEntry: { $last: '$$ROOT' },
+        },
+      },
+      {
+        $replaceRoot: { newRoot: '$latestEntry' },
+      },
+      {
+        $group: {
+          _id: {
+             date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            _id: '$clientSelect',
+          },
+          latestEntries: {
+            $push: {
+              selectbox: '$selectbox',
+              sent: '$sent',
+            },
+          },
+          Airtel_A: {
+            $sum: {
+              $cond: { if: { $eq: ['$selectbox', 'A_airtel'] }, then: '$sent', else: 0 }
+            },
+          },
+          Airtel_M: {
+            $sum: {
+              $cond: { if: { $eq: ['$selectbox', 'M_airtel'] }, then: '$sent', else: 0 }
+            },
+          },
+          BSNL: {
+            $sum: {
+              $cond: { if: { $eq: ['$selectbox', 'BSNL'] }, then: '$sent', else: 0 }
+            },
+          },
+        },
+      },
+      {
+        $sort: { '_id.date': -1 }
       }
-      if (!acc[date][selectbox]) {
-        acc[date][selectbox] = 0;
-      }
-
-      acc[date][selectbox] += sent;
-      // Calculate the Total Data for each date
-      acc[date].TotalData = (acc[date]['A_airtel'] || 0) + (acc[date]['M_airtel'] || 0) + (acc[date]['BSNL'] || 0);
-      return acc;
-    }, {});
+    ];
+    
    
+    
+    
+
+    const latestEntries = await FormData.aggregate(datePipeline);
+    console.log(latestEntries);
+    const airtelASum = {};
+    const airtelMSum = {};
+    const bsnlSum = {};
+    
+    latestEntries.forEach(entry => {
+      const date = entry._id.date;
+      const airtelA = entry.Airtel_A;
+      const airtelM = entry.Airtel_M;
+      const bsnl = entry.BSNL;
+    
+      if (!airtelASum[date]) {
+        airtelASum[date] = 0;
+      }
+      if (!airtelMSum[date]) {
+        airtelMSum[date] = 0;
+      }
+      if (!bsnlSum[date]) {
+        bsnlSum[date] = 0;
+      }
+    
+      airtelASum[date] += airtelA;
+      airtelMSum[date] += airtelM;
+      bsnlSum[date] += bsnl;
+    });
+    
+    // console.log("Airtel A Sum:", airtelASum);
+    // console.log("Airtel M Sum:", airtelMSum);
+    // console.log("BSNL Sum:", bsnlSum);
+
+
     const latestTelecomData = await Telecom.aggregate([
       {
         $sort: { createdAt: -1 } // Sort Telecom entries by createdAt in descending order
@@ -901,12 +985,16 @@ app.get("/dateData", async (req, res) => {
       },
     ]);
 
-    console.log(latestTelecomData);
+   console.log(latestTelecomData);
+   
+    res.render('dateData', {
+      airtelASum,
+      airtelMSum,
+      bsnlSum,
+      latestTelecomData: latestTelecomData,
+    });
+    
 
-    const sortedDateWiseData = Object.values(dateWiseData)
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
-    //  console.log(sortedTelecomData);
-    res.render('dateData', { dateWiseData: sortedDateWiseData,  latestTelecomData: latestTelecomData });
   } catch (error) {
     console.error(error);
   }
