@@ -211,7 +211,7 @@ app.get('/sentReport', async (req, res) => {
 
     if (selectedDate) {
       startDate = new Date(selectedDate);
-      console.log("namaste");
+
       pipeline = [
         {
           $match: {
@@ -235,11 +235,6 @@ app.get('/sentReport', async (req, res) => {
         },
       ];
     }
-    // Add a $sort stage to sort the results by clientSelect
-    // const sortValue = req.query.sort === '-clientSelect' ? -1 : 1; // Toggle between ascending and descending
-    // pipeline.push({
-    //   $sort: { clientSelect: sortValue }
-    // });
 
     const latestEntries = await FormData.aggregate(pipeline);
 
@@ -267,7 +262,7 @@ app.get('/sentReport', async (req, res) => {
     // console.log('Total M_airtel:', totalAirtel_M);
     // console.log('Total BSNL:', totalBSNL);
 
-    const subtractedVAl1 =  totalAirtel_A - lastAirtel_A_100;
+    const subtractedVAl1 = totalAirtel_A - lastAirtel_A_100;
     const subtractedVAl2 = totalAirtel_M - lastAirtel_M_100;
     const subtractedVAl3 = totalBSNL - lastBSNL_100;
     const total = subtractedVAl1 + subtractedVAl2 + subtractedVAl3;
@@ -282,17 +277,7 @@ app.get('/sentReport', async (req, res) => {
       });
       return filledEntry;
     });
-    // console.log("x''",totalAirtel_A);
-    // console.log("y''",totalAirtel_M);
-    // console.log("z''",totalBSNL);
-    // console.log("x'",subtractedVAl1);
-    // console.log("y'",subtractedVAl2);
-    // console.log("z'",subtractedVAl3);
-   
-    // console.log("x : " , lastAirtel_A_100);
-    // console.log("y : " , lastAirtel_M_100);
-    // console.log("z : " , lastBSNL_100);
-    // Render a new view with the total values
+
     res.render('sentreport', { latestEntries: processedEntries, selectedDate, lastTotal, lastAirtel_A_100, lastAirtel_M_100, lastBSNL_100, total, subtractedVAl1, subtractedVAl2, subtractedVAl3, totalAirtel_A, totalAirtel_M, totalBSNL, selectedOperator, TotalOfALl });
   } catch (error) {
     console.log(error);
@@ -404,7 +389,7 @@ app.get('/simData', async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Get the requested page number from query params
     const skip = (page - 1) * ITEMS_PER_PAGEs;
 
-    
+
     // Fetch the latest Telecom document from the database sorted by createdAt
     const latestTelecomData = await Telecom.findOne().sort({ createdAt: -1 }).exec();
 
@@ -721,10 +706,159 @@ app.get("/clientData", async (req, res) => {
 
 // total of all operator
 
+// app.get("/dateData", async (req, res) => {
+
+//   try {
+
+//     // const data = await FormData.find({}, 'createdAt selectbox sent');
+
+//     const data = await FormData.find();
+//     // Calculate date-wise total data
+//     const dateWiseData = data.reduce(async(acc, entry) => {
+//       const date = entry.createdAt.toISOString().slice(0, 10); // Extract the date part
+//      console.log(date);
+
+//       const selectbox = entry.selectbox; // Airtel A, Airtel M, BSNL, etc.
+//       const sent = entry.sent;
+//       let pipeline = [
+//         {
+//           $group: {
+//             _id: {
+//               clientSelect: '$clientSelect',
+//               selectbox: '$selectbox',
+//             },
+//             latestEntry: { $last: '$$ROOT' },
+//           },
+//         },
+//         {
+//           $replaceRoot: { newRoot: '$latestEntry' },
+//         },
+//         {
+//           $group: {
+//             _id: '$clientSelect',
+//             latestEntries: { $push: { selectbox: '$selectbox', sent: '$sent', lastUpdate: '$lastUpdate' } },
+//           },
+//         },
+//       ];
+//    if (date) {
+//         startDate = new Date(date);
+
+//         pipeline = [
+//           {
+//             $match: {
+//               createdAt: {
+//                 $gte: new Date(date),
+//                 $lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1)),
+//               },
+//             },
+//           },
+//           ...pipeline,
+//         ];
+//       }
+//       const latestEntries = await FormData.aggregate(pipeline);
+
+//       // Calculate totals
+//       let totalAirtel_A = 0;
+//       let totalAirtel_M = 0;
+//       let totalBSNL = 0;
+
+//       latestEntries.forEach((entry) => {
+//         entry.latestEntries.forEach((selectboxEntry) => {
+//           if (selectboxEntry.sent !== undefined && selectboxEntry.sent !== null) {
+//             if (selectboxEntry.selectbox === 'A_airtel') {
+//               totalAirtel_A += selectboxEntry.sent;
+//             } else if (selectboxEntry.selectbox === 'M_airtel') {
+//               totalAirtel_M += selectboxEntry.sent;
+//             } else if (selectboxEntry.selectbox === 'BSNL') {
+//               totalBSNL += selectboxEntry.sent;
+//             }
+//           }
+//         });
+//       });
+//       const TotalOfALl = totalAirtel_A + totalAirtel_M + totalBSNL;
+//       console.log("x : ",TotalOfALl);
+//       console.log("y : ",totalAirtel_A);
+//       console.log("z : ",totalAirtel_M);
+//       console.log("p : ",totalBSNL);
+
+//       if (!acc[date]) {
+//         acc[date] = { date };
+//       }
+//       if (!acc[date][selectbox]) {
+//         acc[date][selectbox] = 0;
+//       }
+
+//       acc[date][selectbox] += sent;
+//       // Calculate the Total Data for each date
+//       acc[date].TotalData = (acc[date]['A_airtel'] || 0) + (acc[date]['M_airtel'] || 0) + (acc[date]['BSNL'] || 0);
+//       return acc;
+//     }, {});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     // Fetch the latest Telecom document from the database sorted by createdAt
+//     const latestTelecomData = await Telecom.findOne().sort({ createdAt: -1 }).exec();
+
+//     // Create an array with the latest entry
+//     const telecomDatas = latestTelecomData ? [latestTelecomData] : [];
+
+//     // Calculate the latest sum of Airtel A, Airtel M, and BSNL data
+//     const latestTotalAirtel_A = latestTelecomData ? latestTelecomData.airtel_A : 0;
+//     const latestTotalAirtel_M = latestTelecomData ? latestTelecomData.airtel_M : 0;
+//     const latestTotalBSNL = latestTelecomData ? latestTelecomData.BSNL : 0;
+
+//     // Add the latest total data to the date-wise data
+//     if (telecomDatas.length === 1) {
+//       const latestEntry = telecomDatas[0];
+//       const date = latestEntry.createdAt.toISOString().slice(0, 10);
+//       if (!dateWiseData[date]) {
+//         dateWiseData[date] = { date };
+//       }
+//       dateWiseData[date].latestTotalAirtel_A = latestTotalAirtel_A;
+//       dateWiseData[date].latestTotalAirtel_M = latestTotalAirtel_M;
+//       dateWiseData[date].latestTotalBSNL = latestTotalBSNL;
+//     }
+
+
+//     let totalLatestDataSum = 0;
+//     for (const date in dateWiseData) {
+//       if (dateWiseData[date].latestTotalAirtel_A && dateWiseData[date].latestTotalAirtel_M && dateWiseData[date].latestTotalBSNL) {
+//         totalLatestDataSum += dateWiseData[date].latestTotalAirtel_A + dateWiseData[date].latestTotalAirtel_M + dateWiseData[date].latestTotalBSNL;
+//       }
+//     }
+
+//     // Multiply the total by 100
+//     totalLatestDataSum *= 100;
+
+//     // console.log(totalLatestDataSum);
+//     const sortedDateWiseData = Object.values(dateWiseData)
+//       .sort((a, b) => new Date(b.date) - new Date(a.date));
+//     //  console.log(sortedTelecomData);
+//     res.render('dateData', { dateWiseData: sortedDateWiseData, totalLatestDataSum });
+//   } catch (error) {
+//     console.error(error);
+//   }
+// })
+
 app.get("/dateData", async (req, res) => {
 
   try {
-    const getSimData = await Telecom.find({}, 'createdAt airtel_A airtel_M BSNL');
+   
     const data = await FormData.find({}, 'createdAt selectbox sent');
 
     // Calculate date-wise total data
@@ -736,11 +870,6 @@ app.get("/dateData", async (req, res) => {
       if (!acc[date]) {
         acc[date] = { date };
       }
-      // if (!acc[date]) {
-      //   acc[date] = { date: new Date(date), formattedDate: date }; // Store both date formats
-      // }
-
-
       if (!acc[date][selectbox]) {
         acc[date][selectbox] = 0;
       }
@@ -750,39 +879,40 @@ app.get("/dateData", async (req, res) => {
       acc[date].TotalData = (acc[date]['A_airtel'] || 0) + (acc[date]['M_airtel'] || 0) + (acc[date]['BSNL'] || 0);
       return acc;
     }, {});
-    // Calculate date-wise total data for Telecom
-    const telecomData = getSimData.reduce((acc, entry) => {
-      // console.log("shree radhe")
-      const date = entry.createdAt.toISOString().slice(0, 10);
-      if (!acc[date]) {
-        acc[date] = {
-          totalAirtel_A: 0,
-          totalAirtel_M: 0,
-          totalBSNL: 0
-        };
-      }
-      acc[date].totalAirtel_A += entry.airtel_A || 0;
-      acc[date].totalAirtel_M += entry.airtel_M || 0;
-      acc[date].totalBSNL += entry.BSNL || 0;
-      return acc;
-    }, {});
-    // console.log(telecomData);
-    // Calculate date-wise total data for Telecom
-    //  const telecomData = getSimData.reduce((acc, entry) => {
-    //   const date = entry.createdAt.toISOString().slice(0, 10); 
-    //   acc[date] = entry; 
-    //   return acc;
-    // }, {});
+   
+    const latestTelecomData = await Telecom.aggregate([
+      {
+        $sort: { createdAt: -1 } // Sort Telecom entries by createdAt in descending order
+      },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          },
+          latestEntry: { $first: '$$ROOT' }, // Find the latest Telecom entry for each date
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id field
+          date: '$_id.date',
+          total: { $multiply: [{ $sum: ['$latestEntry.airtel_A', '$latestEntry.airtel_M', '$latestEntry.BSNL'] }, 100] },
+        },
+      },
+    ]);
 
+    console.log(latestTelecomData);
 
-    // Convert dateWiseData into an array and sort it by date in descending order (newest first)
     const sortedDateWiseData = Object.values(dateWiseData)
       .sort((a, b) => new Date(b.date) - new Date(a.date));
-    res.render('dateData', { dateWiseData: sortedDateWiseData, telecomData });
+    //  console.log(sortedTelecomData);
+    res.render('dateData', { dateWiseData: sortedDateWiseData,  latestTelecomData: latestTelecomData });
   } catch (error) {
     console.error(error);
   }
 })
+
+
 app.listen(port, () => {
   console.log(`Server Running at http://localhost:${port}`);
 })

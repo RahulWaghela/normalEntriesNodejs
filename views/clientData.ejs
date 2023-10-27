@@ -1,17 +1,22 @@
 <!doctype html>
 <html lang="en">
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            crossorigin="anonymous">
 
-    <title>Hello, world!</title>
-    <style>
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+        <title>Hello, world!</title>
+        <style>
         .pagination {
             display: flex;
             justify-content: space-around;
@@ -25,11 +30,42 @@
             padding: 5px;
             border-radius: 5px;
         }
-    </style>
-</head>
 
-<body>
-    <%- include('partials/navbar') %>
+        .table {
+            width: 100%;
+        }
+
+        .popup {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+
+        .popup-content {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+    </head>
+
+    <body>
+        <%- include('partials/navbar') %>
 
         <div class="container mt-5 p-4 shadow-lg w-75">
             <h2 class="text-center">Client's Data</h2>
@@ -38,56 +74,119 @@
                     <thead>
                         <tr>
                             <th>Client Name
-                                <a href="/clientData?sort=username" class="sort-link" id="change">&#9650;</a>
-                                <a href="/clientData?sort=-username" id="change" class="sort-link">&#9660;</a>
+                                <a href="/clientData?sort=username"
+                                    class="sort-link" id="change">&#9650;</a>
+                                <a href="/clientData?sort=-username" id="change"
+                                    class="sort-link">&#9660;</a>
                             </th>
                             <th>Airtel A Data
-                                <a href="/clientData?sort=sim1" class="sort-link" id="change">&#9650;</a>
-                                <a href="/clientData?sort=-sim1" id="change" class="sort-link">&#9660;</a>
+                                <a href="/clientData?sort=sim1"
+                                    class="sort-link" id="change">&#9650;</a>
+                                <a href="/clientData?sort=-sim1" id="change"
+                                    class="sort-link">&#9660;</a>
                             </th>
                             <th>Airtel M Data
-                                <a href="/clientData?sort=sim2" class="sort-link" id="change">&#9650;</a>
-                                <a href="/clientData?sort=-sim2" id="change" class="sort-link">&#9660;</a>
+                                <a href="/clientData?sort=sim2"
+                                    class="sort-link" id="change">&#9650;</a>
+                                <a href="/clientData?sort=-sim2" id="change"
+                                    class="sort-link">&#9660;</a>
                             </th>
                             <th>BSNL Data
-                                <a href="/clientData?sort=sim3" class="sort-link" id="change">&#9650;</a>
-                                <a href="/clientData?sort=-sim3" id="change" class="sort-link">&#9660;</a>
+                                <a href="/clientData?sort=sim3"
+                                    class="sort-link" id="change">&#9650;</a>
+                                <a href="/clientData?sort=-sim3" id="change"
+                                    class="sort-link">&#9660;</a>
                             </th>
+                            <th>view details</th>
+
                         </tr>
                     </thead>
                 </thead>
                 <tbody>
                     <% clientData.forEach(user=> { %>
-                        <tr>
-                            <td>
-                                <%= user.client %>
-                            </td>
-                            <td>
-                                <%= user.totalAirtelAData %>
-                            </td>
-                            <td>
-                                <%= user.totalAirtelMData %>
-                            </td>
-                            <td>
-                                <%= user.totalBsnlData %>
-                            </td>
-                        </tr>
-                        <% }); %>
+                    <tr>
+                        <td>
+                            <%= user.client %>
+                        </td>
+                        <td>
+                            <%= user.totalAirtelAData %>
+                        </td>
+                        <td>
+                            <%= user.totalAirtelMData %>
+                        </td>
+                        <td>
+                            <%= user.totalBsnlData %>
+                        </td>
+                        <td><button class="view-details-button"
+                                data-client="<%= user.client %>"
+                                data-airtel="<%= user.totalAirtelAData %>"
+                                data-bsnl="<%= user.totalBsnlData %>">View
+                                Details</button></td>
+                    </tr>
+                    <% }); %>
 
                 </tbody>
             </table>
-
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Client
+                                Details</h5>
+                            <button type="button" class="close"
+                                data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Client Name:</strong> <span
+                                    id="clientName"></span></p>
+                            <p><strong>Airtel A Data:</strong> <span
+                                    id="airtelAData"></span></p>
+                            <p><strong>BSNL Data:</strong> <span id="bsnlData"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <script>
+            const viewButtons = document.querySelectorAll(".view-details-button");
+            const clientName = document.getElementById("clientName");
+            const airtelAData = document.getElementById("airtelAData");
+            const bsnlData = document.getElementById("bsnlData");
+        
+            viewButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    const client = button.getAttribute("data-client");
+                    const airtel = button.getAttribute("data-airtel");
+                    const bsnl = button.getAttribute("data-bsnl");
+        
+                    clientName.textContent = client;
+                    airtelAData.textContent = airtel;
+                    bsnlData.textContent = bsnl;
+                    
+                    $('#myModal').modal('show');
+                });
+            });
+        </script>
+        <script>
 
+
+
+        </script>
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
             crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        <script
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
             crossorigin="anonymous"></script>
-</body>
+    </body>
 
 </html>
