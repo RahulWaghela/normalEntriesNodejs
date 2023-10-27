@@ -985,8 +985,8 @@ app.get("/dateData", async (req, res) => {
       },
     ]);
 
-   console.log(latestTelecomData);
-   
+  //  console.log(latestTelecomData);
+
     res.render('dateData', {
       airtelASum,
       airtelMSum,
