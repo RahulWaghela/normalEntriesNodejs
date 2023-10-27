@@ -317,6 +317,70 @@ app.post('/sendInDatabase', async (req, res) => {
   }
 })
 
+
+
+//render the popup model for editing name and mobile individually with existing name and mobile
+app.get('/getUserRole/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    // console.log(userId);
+    // Fetch the user's role from MongoDB
+    const user = await allDetailsofUser.findById(userId);
+    console.log(user);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return the user's role as a response
+    return res.status(200).json({ name: user.name, phone: user.phone });
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+// handle the route for updating the user's name and mobile
+app.post('/updateRole/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const newname = req.body.newname;
+    const newmobile = req.body.newmobile;
+    console.log(newname);
+    console.log(newmobile);
+    //update users name and mobile in mongodb
+    const user = await allDetailsofUser.findOneAndUpdate(
+      { _id: userId },
+      { name: newname, phone: newmobile },
+
+      { new: true }
+    );
+    console.log(user);
+    // Check if the user was found and updated
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Send a success response
+    return res.status(200).json({ message: 'User role updated successfully', user });
+  } catch (error) {
+    console.error('Error updating user role:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // queue Data post Request Starts
 app.post('/submit-form', async (req, res) => {
   const allUsers = await allDetailsofUser.find();
@@ -897,7 +961,7 @@ app.get("/dateData", async (req, res) => {
       {
         $group: {
           _id: {
-             date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
             _id: '$clientSelect',
           },
           latestEntries: {
@@ -927,23 +991,23 @@ app.get("/dateData", async (req, res) => {
         $sort: { '_id.date': -1 }
       }
     ];
-    
-   
-    
-    
+
+
+
+
 
     const latestEntries = await FormData.aggregate(datePipeline);
     console.log(latestEntries);
     const airtelASum = {};
     const airtelMSum = {};
     const bsnlSum = {};
-    
+
     latestEntries.forEach(entry => {
       const date = entry._id.date;
       const airtelA = entry.Airtel_A;
       const airtelM = entry.Airtel_M;
       const bsnl = entry.BSNL;
-    
+
       if (!airtelASum[date]) {
         airtelASum[date] = 0;
       }
@@ -953,12 +1017,12 @@ app.get("/dateData", async (req, res) => {
       if (!bsnlSum[date]) {
         bsnlSum[date] = 0;
       }
-    
+
       airtelASum[date] += airtelA;
       airtelMSum[date] += airtelM;
       bsnlSum[date] += bsnl;
     });
-    
+
     // console.log("Airtel A Sum:", airtelASum);
     // console.log("Airtel M Sum:", airtelMSum);
     // console.log("BSNL Sum:", bsnlSum);
@@ -985,7 +1049,7 @@ app.get("/dateData", async (req, res) => {
       },
     ]);
 
-  //  console.log(latestTelecomData);
+    //  console.log(latestTelecomData);
 
     res.render('dateData', {
       airtelASum,
@@ -993,7 +1057,7 @@ app.get("/dateData", async (req, res) => {
       bsnlSum,
       latestTelecomData: latestTelecomData,
     });
-    
+
 
   } catch (error) {
     console.error(error);
